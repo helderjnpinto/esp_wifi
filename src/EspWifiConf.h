@@ -1,8 +1,8 @@
 
-#ifndef IotWebConf_h
-#define IotWebConf_h
+#ifndef EspWifi_h
+#define EspWifi_h
 
-#include <IotWebConfCompatibility.h>
+#include <EspWifiCompatibility.h>
 
 #ifdef ESP8266
 # include <ESP8266WiFi.h>
@@ -15,89 +15,89 @@
 #include <DNSServer.h> // -- For captive portal
 
 // -- We might want to place the config in the EEPROM in an offset.
-#define IOTWEBCONF_CONFIG_START 0
+#define ESPWIFI_CONFIG_START 0
 
-// -- Maximal length of any string used in IotWebConfig configuration (e.g.
+// -- Maximal length of any string used in EspWifiig configuration (e.g.
 // ssid, password).
-#define IOTWEBCONF_WORD_LEN 33
+#define ESPWIFI_WORD_LEN 33
 
 // -- ESPWIFI tries to connect to the local network for an amount of time
 // before falling back to AP mode.
-#define IOTWEBCONF_DEFAULT_WIFI_CONNECTION_TIMEOUT_MS 30000
+#define ESPWIFI_DEFAULT_WIFI_CONNECTION_TIMEOUT_MS 30000
 
 // -- Thing will stay in AP mode for an amount of time on boot, before retrying
 // to connect to a WiFi network.
-#define IOTWEBCONF_DEFAULT_AP_MODE_TIMEOUT_MS 30000
+#define ESPWIFI_DEFAULT_AP_MODE_TIMEOUT_MS 30000
 
 // -- mDNS should allow you to connect to this device with a hostname provided
 // by the device. E.g. mything.local
-#define IOTWEBCONF_CONFIG_USE_MDNS
+#define ESPWIFI_CONFIG_USE_MDNS
 
 // -- Logs progress information to Serial if enabled.
-#define IOTWEBCONF_DEBUG_TO_SERIAL
+#define ESPWIFI_DEBUG_TO_SERIAL
 
 // -- Logs passwords to Serial if enabled.
-//#define IOTWEBCONF_DEBUG_PWD_TO_SERIAL
+//#define ESPWIFI_DEBUG_PWD_TO_SERIAL
 
 // -- Helper define for serial debug
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
-# define IOTWEBCONF_DEBUG_LINE(MSG) Serial.println(MSG)
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
+# define ESPWIFI_DEBUG_LINE(MSG) Serial.println(MSG)
 #else
-# define IOTWEBCONF_DEBUG_LINE(MSG)
+# define ESPWIFI_DEBUG_LINE(MSG)
 #endif
 
 // -- EEPROM config starts with a special prefix of length defined here.
-#define IOTWEBCONF_CONFIG_VESION_LENGTH 4
-#define IOTWEBCONF_DNS_PORT 53
+#define ESPWIFI_CONFIG_VESION_LENGTH 4
+#define ESPWIFI_DNS_PORT 53
 
 // -- HTML page fragments
-const char IOTWEBCONF_HTML_HEAD[] PROGMEM         = "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/><title>{v}</title>";
-const char IOTWEBCONF_HTML_STYLE_INNER[] PROGMEM  = ".de{background-color:#ffaaaa;} .em{font-size:0.8em;color:#bb0000;padding-bottom:0px;} .c{text-align: center;} div,input{padding:5px;font-size:1em;} input{width:95%;} body{text-align: center;font-family:verdana;} button{border:0;border-radius:0.3rem;background-color:#16A1E7;color:#fff;line-height:2.4rem;font-size:1.2rem;width:100%;} fieldset{border-radius:0.3rem;margin: 0px;}";
-const char IOTWEBCONF_HTML_SCRIPT_INNER[] PROGMEM = "function c(l){document.getElementById('s').value=l.innerText||l.textContent;document.getElementById('p').focus();}";
-const char IOTWEBCONF_HTML_HEAD_END[] PROGMEM     = "</head><body>";
-const char IOTWEBCONF_HTML_BODY_INNER[] PROGMEM   = "<div style='text-align:left;display:inline-block;min-width:260px;'>";
-const char IOTWEBCONF_HTML_FORM_START[] PROGMEM   = "<form action='' method='post'><fieldset><input type='hidden' name='iotSave' value='true'>";
-const char IOTWEBCONF_HTML_FORM_PARAM[] PROGMEM   = "<div class='{s}'><label for='{i}'>{b}</label><input type='{t}' id='{i}' name='{i}' maxlength={l} placeholder='{p}' value='{v}' {c}/><div class='em'>{e}</div></div>";
-const char IOTWEBCONF_HTML_FORM_END[] PROGMEM     = "</fieldset><button type='submit'>Apply</button></form>";
-const char IOTWEBCONF_HTML_SAVED[] PROGMEM        = "<div>Condiguration saved<br />Return to <a href='/'>home page</a>.</div>";
-const char IOTWEBCONF_HTML_END[] PROGMEM          = "</div></body></html>";
-const char IOTWEBCONF_HTML_UPDATE[] PROGMEM       = "<div style='padding-top:25px;'><a href='{u}'>Firmware update</a></div>";
-const char IOTWEBCONF_HTML_CONFIG_VER[] PROGMEM   = "<div style='font-size: .6em;'>Firmware config version '{v}'</div>";
+const char ESPWIFI_HTML_HEAD[] PROGMEM         = "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/><title>{v}</title>";
+const char ESPWIFI_HTML_STYLE_INNER[] PROGMEM  = ".de{background-color:#ffaaaa;} .em{font-size:0.8em;color:#bb0000;padding-bottom:0px;} .c{text-align: center;} div,input{padding:5px;font-size:1em;} input{width:95%;} body{text-align: center;font-family:verdana;} button{border:0;border-radius:0.3rem;background-color:#16A1E7;color:#fff;line-height:2.4rem;font-size:1.2rem;width:100%;} fieldset{border-radius:0.3rem;margin: 0px;}";
+const char ESPWIFI_HTML_SCRIPT_INNER[] PROGMEM = "function c(l){document.getElementById('s').value=l.innerText||l.textContent;document.getElementById('p').focus();}";
+const char ESPWIFI_HTML_HEAD_END[] PROGMEM     = "</head><body>";
+const char ESPWIFI_HTML_BODY_INNER[] PROGMEM   = "<div style='text-align:left;display:inline-block;min-width:260px;'>";
+const char ESPWIFI_HTML_FORM_START[] PROGMEM   = "<form action='' method='post'><fieldset><input type='hidden' name='iotSave' value='true'>";
+const char ESPWIFI_HTML_FORM_PARAM[] PROGMEM   = "<div class='{s}'><label for='{i}'>{b}</label><input type='{t}' id='{i}' name='{i}' maxlength={l} placeholder='{p}' value='{v}' {c}/><div class='em'>{e}</div></div>";
+const char ESPWIFI_HTML_FORM_END[] PROGMEM     = "</fieldset><button type='submit'>Apply</button></form>";
+const char ESPWIFI_HTML_SAVED[] PROGMEM        = "<div>Condiguration saved<br />Return to <a href='/'>home page</a>.</div>";
+const char ESPWIFI_HTML_END[] PROGMEM          = "</div></body></html>";
+const char ESPWIFI_HTML_UPDATE[] PROGMEM       = "<div style='padding-top:25px;'><a href='{u}'>Firmware update</a></div>";
+const char ESPWIFI_HTML_CONFIG_VER[] PROGMEM   = "<div style='font-size: .6em;'>Firmware config version '{v}'</div>";
 
 // -- State of the Thing
-#define IOTWEBCONF_STATE_BOOT 0
-#define IOTWEBCONF_STATE_NOT_CONFIGURED 1
-#define IOTWEBCONF_STATE_AP_MODE 2
-#define IOTWEBCONF_STATE_CONNECTING 3
-#define IOTWEBCONF_STATE_ONLINE 4
+#define ESPWIFI_STATE_BOOT 0
+#define ESPWIFI_STATE_NOT_CONFIGURED 1
+#define ESPWIFI_STATE_AP_MODE 2
+#define ESPWIFI_STATE_CONNECTING 3
+#define ESPWIFI_STATE_ONLINE 4
 
 // -- AP connection state
 // -- No connection on AP.
-#define IOTWEBCONF_AP_CONNECTION_STATE_NC 0
+#define ESPWIFI_AP_CONNECTION_STATE_NC 0
 // -- Has connection on AP.
-#define IOTWEBCONF_AP_CONNECTION_STATE_C 1
+#define ESPWIFI_AP_CONNECTION_STATE_C 1
 // -- All previous connection on AP was disconnected.
-#define IOTWEBCONF_AP_CONNECTION_STATE_DC 2
+#define ESPWIFI_AP_CONNECTION_STATE_DC 2
 
 // -- Status indicator output logical levels.
-#define IOTWEBCONF_STATUS_ON LOW
-#define IOTWEBCONF_STATUS_OFF HIGH
+#define ESPWIFI_STATUS_ON LOW
+#define ESPWIFI_STATUS_OFF HIGH
 
 // -- User name on login.
-#define IOTWEBCONF_ADMIN_USER_NAME "admin"
+#define ESPWIFI_ADMIN_USER_NAME "admin"
 
-typedef struct IotWebConfWifiAuthInfo
+typedef struct EspWifiWifiAuthInfo
 {
   const char* ssid;
   const char* password;
-} IotWebConfWifiAuthInfo;
+} EspWifiWifiAuthInfo;
 
 /**
- *   IotWebConfParameters is a configuration item of the config portal.
+ *   EspWifiParameters is a configuration item of the config portal.
  *   The parameter will have its input field on the configuration page,
  *   and the provided value will be saved to the EEPROM.
  */
-class IotWebConfParameter
+class EspWifiParameter
 {
 public:
   /**
@@ -110,12 +110,12 @@ public:
    *   @type (optional, default="text") - The type of the html input field.
    *       The type="password" has a special handling, as the value will be overwritten in the EEPROM
    *       only if value was provided on the config portal. Because of this logic, "password" type field with
-   *       length more then IOTWEBCONF_WORD_LEN characters are not supported.
+   *       length more then ESPWIFI_WORD_LEN characters are not supported.
    *   @placeholder (optional) - Text appear in an empty input box.
    *   @defaultValue (optional) - Value should be pre-filled if none was specified before.
    *   @customHtml (optional) - The text of this parameter will be added into the HTML INPUT field.
    */
-  IotWebConfParameter(
+  EspWifiParameter(
     const char* label, const char* id, char* valueBuffer, int length,
     const char* type = "text", const char* placeholder = NULL,
     const char* defaultValue = NULL, const char* customHtml = NULL,
@@ -126,14 +126,14 @@ public:
    * input field for the item, instead uses the customHtml provided. Note the
    * @type parameter description above!
    */
-  IotWebConfParameter(
+  EspWifiParameter(
       const char* id, char* valueBuffer, int length, const char* customHtml,
       const char* type = "text");
 
   /**
    * For internal use only.
    */
-  IotWebConfParameter();
+  EspWifiParameter();
 
   const char* label;
   char* valueBuffer;
@@ -145,7 +145,7 @@ public:
   const char* errorMessage;
 
   // -- For internal use only
-  IotWebConfParameter* _nextParameter = NULL;
+  EspWifiParameter* _nextParameter = NULL;
 
   const char* getId() { return this->_id; }
   int getLength() { return this->_length; }
@@ -158,39 +158,39 @@ private:
 /**
  * A separator for separating field sets.
  */
-class IotWebConfSeparator : public IotWebConfParameter
+class EspWifiSeparator : public EspWifiParameter
 {
 public:
-  IotWebConfSeparator();
+  EspWifiSeparator();
 
   /**
    * Create a seperator with a label (legend tag)
    */
-  IotWebConfSeparator(const char* label);
+  EspWifiSeparator(const char* label);
 };
 
 /**
  * Class for providing HTML format segments.
  */
-class IotWebConfHtmlFormatProvider
+class EspWifiHtmlFormatProvider
 {
 public:
-  virtual String getHead() { return FPSTR(IOTWEBCONF_HTML_HEAD); }
+  virtual String getHead() { return FPSTR(ESPWIFI_HTML_HEAD); }
   virtual String getStyle() { return "<style>" + getStyleInner() + "</style>"; }
   virtual String getScript() { return "<script>" + getScriptInner() + "</script>"; }
   virtual String getHeadExtension() { return ""; }
-  virtual String getHeadEnd() { return String(FPSTR(IOTWEBCONF_HTML_HEAD_END)) + getBodyInner(); }
-  virtual String getFormStart() { return FPSTR(IOTWEBCONF_HTML_FORM_START); }
-  virtual String getFormParam(const char* type) { return FPSTR(IOTWEBCONF_HTML_FORM_PARAM); }
-  virtual String getFormEnd() { return FPSTR(IOTWEBCONF_HTML_FORM_END); }
-  virtual String getFormSaved() { return FPSTR(IOTWEBCONF_HTML_SAVED); }
-  virtual String getEnd() { return FPSTR(IOTWEBCONF_HTML_END); }
-  virtual String getUpdate() { return FPSTR(IOTWEBCONF_HTML_UPDATE); }
-  virtual String getConfigVer() { return FPSTR(IOTWEBCONF_HTML_CONFIG_VER); }
+  virtual String getHeadEnd() { return String(FPSTR(ESPWIFI_HTML_HEAD_END)) + getBodyInner(); }
+  virtual String getFormStart() { return FPSTR(ESPWIFI_HTML_FORM_START); }
+  virtual String getFormParam(const char* type) { return FPSTR(ESPWIFI_HTML_FORM_PARAM); }
+  virtual String getFormEnd() { return FPSTR(ESPWIFI_HTML_FORM_END); }
+  virtual String getFormSaved() { return FPSTR(ESPWIFI_HTML_SAVED); }
+  virtual String getEnd() { return FPSTR(ESPWIFI_HTML_END); }
+  virtual String getUpdate() { return FPSTR(ESPWIFI_HTML_UPDATE); }
+  virtual String getConfigVer() { return FPSTR(ESPWIFI_HTML_CONFIG_VER); }
 protected:
-  virtual String getStyleInner() { return FPSTR(IOTWEBCONF_HTML_STYLE_INNER); }
-  virtual String getScriptInner() { return FPSTR(IOTWEBCONF_HTML_SCRIPT_INNER); }
-  virtual String getBodyInner() { return FPSTR(IOTWEBCONF_HTML_BODY_INNER); }
+  virtual String getStyleInner() { return FPSTR(ESPWIFI_HTML_STYLE_INNER); }
+  virtual String getScriptInner() { return FPSTR(ESPWIFI_HTML_SCRIPT_INNER); }
+  virtual String getBodyInner() { return FPSTR(ESPWIFI_HTML_BODY_INNER); }
 };
 
 /**
@@ -237,7 +237,7 @@ public:
    * Add an UpdateServer instance to the system. The firmware update link will appear on the config portal.
    * The UpdateServer will be added to the WebServer with the path provided here (or with "firmware",
    * if none was provided).
-   * Login user will be IOTWEBCONF_ADMIN_USER_NAME, password is the password provided in the config portal.
+   * Login user will be ESPWIFI_ADMIN_USER_NAME, password is the password provided in the config portal.
    * Should be called before init()!
    *   @updateServer - An uninitialized UpdateServer instance.
    *   @updatePath - (Optional) The path to set up the UpdateServer with. Will be also used in the config portal.
@@ -323,7 +323,7 @@ public:
    * Note, that this feature is provided because of a possible future option of providing multiply
    * WiFi settings.
    */
-  void setWifiConnectionFailedHandler( std::function<IotWebConfWifiAuthInfo*()> func )
+  void setWifiConnectionFailedHandler( std::function<EspWifiWifiAuthInfo*()> func )
   {
     _wifiConnectionFailureHandler = func;
   }
@@ -335,7 +335,7 @@ public:
    * Will return false, if adding was not successful.
    * Must be called before init()!
    */
-  bool addParameter(IotWebConfParameter* parameter);
+  bool addParameter(EspWifiParameter* parameter);
 
   /**
    * Getter for the actually configured thing name.
@@ -380,7 +380,7 @@ public:
   void stopCustomBlink();
 
   /**
-   * Return the current state, that will be a value from the IOTWEBCONF_STATE_* constants.
+   * Return the current state, that will be a value from the ESPWIFI_STATE_* constants.
    */
   byte getState() { return this->_state; };
 
@@ -421,23 +421,23 @@ public:
    * Normally you don't need to access these parameters directly.
    * Note, that changing valueBuffer of these parameters should be followed by configSave()!
    */
-  IotWebConfParameter* getThingNameParameter()
+  EspWifiParameter* getThingNameParameter()
   {
     return &this->_thingNameParameter;
   };
-  IotWebConfParameter* getApPasswordParameter()
+  EspWifiParameter* getApPasswordParameter()
   {
     return &this->_apPasswordParameter;
   };
-  IotWebConfParameter* getWifiSsidParameter()
+  EspWifiParameter* getWifiSsidParameter()
   {
     return &this->_wifiSsidParameter;
   };
-  IotWebConfParameter* getWifiPasswordParameter()
+  EspWifiParameter* getWifiPasswordParameter()
   {
     return &this->_wifiPasswordParameter;
   };
-  IotWebConfParameter* getApTimeoutParameter()
+  EspWifiParameter* getApTimeoutParameter()
   {
     return &this->_apTimeoutParameter;
   };
@@ -455,11 +455,11 @@ public:
    * provide custom HTML segments.
    */
   void
-  setHtmlFormatProvider(IotWebConfHtmlFormatProvider* customHtmlFormatProvider)
+  setHtmlFormatProvider(EspWifiHtmlFormatProvider* customHtmlFormatProvider)
   {
     this->htmlFormatProvider = customHtmlFormatProvider;
   }
-  IotWebConfHtmlFormatProvider* getHtmlFormatProvider()
+  EspWifiHtmlFormatProvider* getHtmlFormatProvider()
   {
     return this->htmlFormatProvider;
   }
@@ -475,23 +475,23 @@ private:
   const char* _updatePath = NULL;
   boolean _forceDefaultPassword = false;
   boolean _skipApStartup = false;
-  IotWebConfParameter* _firstParameter = NULL;
-  IotWebConfParameter _thingNameParameter;
-  IotWebConfParameter _apPasswordParameter;
-  IotWebConfParameter _wifiSsidParameter;
-  IotWebConfParameter _wifiPasswordParameter;
-  IotWebConfParameter _apTimeoutParameter;
-  char _thingName[IOTWEBCONF_WORD_LEN];
-  char _apPassword[IOTWEBCONF_WORD_LEN];
-  char _wifiSsid[IOTWEBCONF_WORD_LEN];
-  char _wifiPassword[IOTWEBCONF_WORD_LEN];
-  char _apTimeoutStr[IOTWEBCONF_WORD_LEN];
-  unsigned long _apTimeoutMs = IOTWEBCONF_DEFAULT_AP_MODE_TIMEOUT_MS;
+  EspWifiParameter* _firstParameter = NULL;
+  EspWifiParameter _thingNameParameter;
+  EspWifiParameter _apPasswordParameter;
+  EspWifiParameter _wifiSsidParameter;
+  EspWifiParameter _wifiPasswordParameter;
+  EspWifiParameter _apTimeoutParameter;
+  char _thingName[ESPWIFI_WORD_LEN];
+  char _apPassword[ESPWIFI_WORD_LEN];
+  char _wifiSsid[ESPWIFI_WORD_LEN];
+  char _wifiPassword[ESPWIFI_WORD_LEN];
+  char _apTimeoutStr[ESPWIFI_WORD_LEN];
+  unsigned long _apTimeoutMs = ESPWIFI_DEFAULT_AP_MODE_TIMEOUT_MS;
   unsigned long _wifiConnectionTimeoutMs =
-      IOTWEBCONF_DEFAULT_WIFI_CONNECTION_TIMEOUT_MS;
-  byte _state = IOTWEBCONF_STATE_BOOT;
+      ESPWIFI_DEFAULT_WIFI_CONNECTION_TIMEOUT_MS;
+  byte _state = ESPWIFI_STATE_BOOT;
   unsigned long _apStartTimeMs = 0;
-  byte _apConnectionStatus = IOTWEBCONF_AP_CONNECTION_STATE_NC;
+  byte _apConnectionStatus = ESPWIFI_AP_CONNECTION_STATE_NC;
   std::function<void()> _wifiConnectionCallback = NULL;
   std::function<void()> _configSavedCallback = NULL;
   std::function<boolean()> _formValidator = NULL;
@@ -499,18 +499,18 @@ private:
       &(ESPWIFI::connectAp);
   std::function<void(const char*, const char*)> _wifiConnectionHandler =
       &(ESPWIFI::connectWifi);
-  std::function<IotWebConfWifiAuthInfo*()> _wifiConnectionFailureHandler =
+  std::function<EspWifiWifiAuthInfo*()> _wifiConnectionFailureHandler =
       &(ESPWIFI::handleConnectWifiFailure);
   unsigned long _internalBlinkOnMs = 500;
   unsigned long _internalBlinkOffMs = 500;
   unsigned long _blinkOnMs = 500;
   unsigned long _blinkOffMs = 500;
-  byte _blinkState = IOTWEBCONF_STATUS_ON;
+  byte _blinkState = ESPWIFI_STATUS_ON;
   unsigned long _lastBlinkTime = 0;
   unsigned long _wifiConnectionStart = 0;
-  IotWebConfWifiAuthInfo _wifiAuthInfo = {_wifiSsid, _wifiPassword};
-  IotWebConfHtmlFormatProvider htmlFormatProviderInstance;
-  IotWebConfHtmlFormatProvider* htmlFormatProvider = &htmlFormatProviderInstance;
+  EspWifiWifiAuthInfo _wifiAuthInfo = {_wifiSsid, _wifiPassword};
+  EspWifiHtmlFormatProvider htmlFormatProviderInstance;
+  EspWifiHtmlFormatProvider* htmlFormatProvider = &htmlFormatProviderInstance;
 
   void configInit();
   boolean configLoad();
@@ -541,7 +541,7 @@ private:
 
   static boolean connectAp(const char* apName, const char* password);
   static void connectWifi(const char* ssid, const char* password);
-  static IotWebConfWifiAuthInfo* handleConnectWifiFailure();
+  static EspWifiWifiAuthInfo* handleConnectWifiFailure();
 };
 
 #endif

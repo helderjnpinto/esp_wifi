@@ -1,11 +1,7 @@
 /**
- * Example: Custom connection
+ * Example: Callbacks
  * Description:
- *   This example is for advanced users only!
- *   In this example custom connection handler methods are defined
- *   to override the default connecting behavior.
- *   Also, three custom parameters are introduced, that are used
- *   at the connection.
+ *   This example shows, what callbacks ESPWIFI provides.
  *   (See previous examples for more details!)
  * 
  * Hardware setup for this example:
@@ -23,14 +19,13 @@ const char thingName[] = "testThing";
 const char wifiInitialApPassword[] = "smrtTHNG8266";
 
 #define STRING_LEN 128
-#define NUMBER_LEN 32
 
 // -- Configuration specific key. The value should be modified if config structure was changed.
-#define CONFIG_VERSION "dem9"
+#define CONFIG_VERSION "dem3"
 
 // -- When CONFIG_PIN is pulled to ground on startup, the Thing will use the initial
 //      password to buld an AP. (E.g. in case of lost password)
-#define CONFIG_PIN 2
+#define CONFIG_PIN D2
 
 // -- Status indicator pin.
 //      First it will light up (kept LOW), on Wifi connection it will blink,
@@ -38,26 +33,19 @@ const char wifiInitialApPassword[] = "smrtTHNG8266";
 #define STATUS_PIN LED_BUILTIN
 
 // -- Callback method declarations.
+void wifiConnected();
 void configSaved();
 boolean formValidator();
-boolean connectAp(const char* apName, const char* password);
-void connectWifi(const char* ssid, const char* password);
+void messageReceived(String &topic, String &payload);
 
 DNSServer dnsServer;
 WebServer server(80);
+HTTPUpdateServer httpUpdater;
 
-char ipAddressValue[STRING_LEN];
-char gatewayValue[STRING_LEN];
-char netmaskValue[STRING_LEN];
+char stringParamValue[STRING_LEN];
 
 ESPWIFI iotWebConf(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
-IotWebConfParameter ipAddressParam = IotWebConfParameter("IP address", "ipAddress", ipAddressValue, STRING_LEN, "text", NULL, "192.168.3.222");
-IotWebConfParameter gatewayParam = IotWebConfParameter("Gateway", "gateway", gatewayValue, STRING_LEN, "text", NULL, "192.168.3.0");
-IotWebConfParameter netmaskParam = IotWebConfParameter("Subnet mask", "netmask", netmaskValue, STRING_LEN, "text", NULL, "255.255.255.0");
-
-IPAddress ipAddress;
-IPAddress gateway;
-IPAddress netmask;
+EspWifiParameter stringParam = EspWifiParameter("String param", "stringParam", stringParamValue, STRING_LEN);
 
 void setup() 
 {
@@ -67,16 +55,17 @@ void setup()
 
   iotWebConf.setStatusPin(STATUS_PIN);
   iotWebConf.setConfigPin(CONFIG_PIN);
-  iotWebConf.addParameter(&ipAddressParam);
-  iotWebConf.addParameter(&gatewayParam);
-  iotWebConf.addParameter(&netmaskParam);
+  iotWebConf.addParameter(&stringParam);
   iotWebConf.setConfigSavedCallback(&configSaved);
   iotWebConf.setFormValidator(&formValidator);
-  iotWebConf.setApConnectionHandler(&connectAp);
-  iotWebConf.setWifiConnectionHandler(&connectWifi);
+  iotWebConf.setWifiConnectionCallback(&wifiConnected);
 
   // -- Initializing the configuration.
   boolean validConfig = iotWebConf.init();
+  if (!validConfig)
+  {
+    stringParamValue[0] = '\0';
+  }
 
   // -- Set up required URL handlers on the web server.
   server.on("/", handleRoot);
@@ -104,15 +93,20 @@ void handleRoot()
     return;
   }
   String s = "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>";
-  s += "<title>ESPWIFI 09 Custom Connection</title></head><body>Hello world!";
+  s += "<title>ESPWIFI 05 Callbacks</title></head><body>Hello world!";
   s += "<ul>";
-  s += "<li>IP address: ";
-  s += ipAddressValue;
+  s += "<li>String param value: ";
+  s += stringParamValue;
   s += "</ul>";
   s += "Go to <a href='config'>configure page</a> to change values.";
   s += "</body></html>\n";
 
   server.send(200, "text/html", s);
+}
+
+void wifiConnected()
+{
+  Serial.println("WiFi was connected.");
 }
 
 void configSaved()
@@ -125,44 +119,13 @@ boolean formValidator()
   Serial.println("Validating form.");
   boolean valid = true;
 
-  if (!ipAddress.fromString(server.arg(ipAddressParam.getId())))
+  int l = server.arg(stringParam.getId()).length();
+  if (l < 3)
   {
-    ipAddressParam.errorMessage = "Please provide a valid IP address!";
-    valid = false;
-  }
-  if (!netmask.fromString(server.arg(netmaskParam.getId())))
-  {
-    netmaskParam.errorMessage = "Please provide a valid netmask!";
-    valid = false;
-  }
-  if (!gateway.fromString(server.arg(gatewayParam.getId())))
-  {
-    gatewayParam.errorMessage = "Please provide a valid gateway address!";
+    stringParam.errorMessage = "Please provide at least 3 characters for this test!";
     valid = false;
   }
 
   return valid;
 }
 
-boolean connectAp(const char* apName, const char* password)
-{
-  // -- Custom AP settings
-  return WiFi.softAP(apName, password, 4);
-}
-void connectWifi(const char* ssid, const char* password)
-{
-  ipAddress.fromString(String(ipAddressValue));
-  netmask.fromString(String(netmaskValue));
-  gateway.fromString(String(gatewayValue));
-
-  if (!WiFi.config(ipAddress, gateway, netmask)) {
-    Serial.println("STA Failed to configure");
-  }
-  Serial.print("ip: ");
-  Serial.println(ipAddress);
-  Serial.print("gw: ");
-  Serial.println(gateway);
-  Serial.print("net: ");
-  Serial.println(netmask);
-  WiFi.begin(ssid, password);
-}

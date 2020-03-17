@@ -2,7 +2,7 @@
 /**
  * NOTE: Lines starting with /// are changed by ESPWIFI
  */
-#include "IotWebConfCompatibility.h"
+#include "EspWifiCompatibility.h"
 
 static const char serverIndex[] PROGMEM =
   R"(<html><body><form method='POST' action='' enctype='multipart/form-data'>

@@ -65,9 +65,9 @@ char mqttUserNameValue[STRING_LEN];
 char mqttUserPasswordValue[STRING_LEN];
 
 ESPWIFI iotWebConf(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
-IotWebConfParameter mqttServerParam = IotWebConfParameter("MQTT server", "mqttServer", mqttServerValue, STRING_LEN);
-IotWebConfParameter mqttUserNameParam = IotWebConfParameter("MQTT user", "mqttUser", mqttUserNameValue, STRING_LEN);
-IotWebConfParameter mqttUserPasswordParam = IotWebConfParameter("MQTT password", "mqttPass", mqttUserPasswordValue, STRING_LEN, "password");
+EspWifiParameter mqttServerParam = EspWifiParameter("MQTT server", "mqttServer", mqttServerValue, STRING_LEN);
+EspWifiParameter mqttUserNameParam = EspWifiParameter("MQTT user", "mqttUser", mqttUserNameValue, STRING_LEN);
+EspWifiParameter mqttUserPasswordParam = EspWifiParameter("MQTT password", "mqttPass", mqttUserPasswordValue, STRING_LEN, "password");
 
 boolean needMqttConnect = false;
 boolean needReset = false;
@@ -124,7 +124,7 @@ void loop()
       needMqttConnect = false;
     }
   }
-  else if ((iotWebConf.getState() == IOTWEBCONF_STATE_ONLINE) && (!mqttClient.connected()))
+  else if ((iotWebConf.getState() == ESPWIFI_STATE_ONLINE) && (!mqttClient.connected()))
   {
     Serial.println("MQTT reconnect");
     connectMqtt();

@@ -1,7 +1,7 @@
  /**
  * Example: Minimal
  * Description:
- *   This example will shows the bare minimum required for IotWeConf to start up.
+ *   This example will shows the bare minimum required for EspWifi to start up.
  *   After starting up the thing, please search for WiFi access points e.g. with
  *   your phone. Use password provided in the code!
  *   After connecting to the access point the root page will automatically appears.
@@ -14,7 +14,7 @@
  *   with connecting to configured WiFi.
  *
  *   Note that you can find detailed debug information in the serial console depending
- *   on the settings IOTWEBCONF_DEBUG_TO_SERIAL, IOTWEBCONF_DEBUG_PWD_TO_SERIAL set
+ *   on the settings ESPWIFI_DEBUG_TO_SERIAL, ESPWIFI_DEBUG_PWD_TO_SERIAL set
  *   in the ESPWIFI.h .
  */
 

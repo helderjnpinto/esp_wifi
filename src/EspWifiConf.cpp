@@ -2,7 +2,7 @@
 
 #include "ESPWIFI.h"
 
-#ifdef IOTWEBCONF_CONFIG_USE_MDNS
+#ifdef ESPWIFI_CONFIG_USE_MDNS
 # ifdef ESP8266
 #  include <ESP8266mDNS.h>
 # elif defined(ESP32)
@@ -10,12 +10,12 @@
 # endif
 #endif
 
-#define IOTWEBCONF_STATUS_ENABLED (this->_statusPin >= 0)
+#define ESPWIFI_STATUS_ENABLED (this->_statusPin >= 0)
 
-IotWebConfParameter::IotWebConfParameter()
+EspWifiParameter::EspWifiParameter()
 {
 }
-IotWebConfParameter::IotWebConfParameter(
+EspWifiParameter::EspWifiParameter(
     const char* label, const char* id, char* valueBuffer, int length,
     const char* type, const char* placeholder, const char* defaultValue,
     const char* customHtml, boolean visible)
@@ -30,7 +30,7 @@ IotWebConfParameter::IotWebConfParameter(
   this->customHtml = customHtml;
   this->visible = visible;
 }
-IotWebConfParameter::IotWebConfParameter(
+EspWifiParameter::EspWifiParameter(
     const char* id, char* valueBuffer, int length, const char* customHtml,
     const char* type)
 {
@@ -44,13 +44,13 @@ IotWebConfParameter::IotWebConfParameter(
   this->errorMessage = NULL;
 }
 
-IotWebConfSeparator::IotWebConfSeparator()
-    : IotWebConfParameter(NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, true)
+EspWifiSeparator::EspWifiSeparator()
+    : EspWifiParameter(NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, true)
 {
 }
 
-IotWebConfSeparator::IotWebConfSeparator(const char* label)
-    : IotWebConfParameter(label, NULL, NULL, 0, NULL, NULL, NULL, NULL, true)
+EspWifiSeparator::EspWifiSeparator(const char* label)
+    : EspWifiParameter(label, NULL, NULL, 0, NULL, NULL, NULL, NULL, true)
 {
 }
 
@@ -60,18 +60,18 @@ ESPWIFI::ESPWIFI(
     const char* defaultThingName, DNSServer* dnsServer, WebServer* server,
     const char* initialApPassword, const char* configVersion)
 {
-  strncpy(this->_thingName, defaultThingName, IOTWEBCONF_WORD_LEN);
+  strncpy(this->_thingName, defaultThingName, ESPWIFI_WORD_LEN);
   this->_dnsServer = dnsServer;
   this->_server = server;
   this->_initialApPassword = initialApPassword;
   this->_configVersion = configVersion;
   itoa(this->_apTimeoutMs / 1000, this->_apTimeoutStr, 10);
 
-  this->_thingNameParameter = IotWebConfParameter("Thing name", "iwcThingName", this->_thingName, IOTWEBCONF_WORD_LEN);
-  this->_apPasswordParameter = IotWebConfParameter("AP password", "iwcApPassword", this->_apPassword, IOTWEBCONF_WORD_LEN, "password");
-  this->_wifiSsidParameter = IotWebConfParameter("WiFi SSID", "iwcWifiSsid", this->_wifiSsid, IOTWEBCONF_WORD_LEN);
-  this->_wifiPasswordParameter = IotWebConfParameter("WiFi password", "iwcWifiPassword", this->_wifiPassword, IOTWEBCONF_WORD_LEN, "password");
-  this->_apTimeoutParameter = IotWebConfParameter("Startup delay (seconds)", "iwcApTimeout", this->_apTimeoutStr, IOTWEBCONF_WORD_LEN, "number", NULL, NULL, "min='1' max='600'", false);
+  this->_thingNameParameter = EspWifiParameter("Thing name", "iwcThingName", this->_thingName, ESPWIFI_WORD_LEN);
+  this->_apPasswordParameter = EspWifiParameter("AP password", "iwcApPassword", this->_apPassword, ESPWIFI_WORD_LEN, "password");
+  this->_wifiSsidParameter = EspWifiParameter("WiFi SSID", "iwcWifiSsid", this->_wifiSsid, ESPWIFI_WORD_LEN);
+  this->_wifiPasswordParameter = EspWifiParameter("WiFi password", "iwcWifiPassword", this->_wifiPassword, ESPWIFI_WORD_LEN, "password");
+  this->_apTimeoutParameter = EspWifiParameter("Startup delay (seconds)", "iwcApTimeout", this->_apTimeoutStr, ESPWIFI_WORD_LEN, "number", NULL, NULL, "min='1' max='600'", false);
   this->addParameter(&this->_thingNameParameter);
   this->addParameter(&this->_apPasswordParameter);
   this->addParameter(&this->_wifiSsidParameter);
@@ -109,10 +109,10 @@ boolean ESPWIFI::init()
     pinMode(this->_configPin, INPUT_PULLUP);
     this->_forceDefaultPassword = (digitalRead(this->_configPin) == LOW);
   }
-  if (IOTWEBCONF_STATUS_ENABLED)
+  if (ESPWIFI_STATUS_ENABLED)
   {
     pinMode(this->_statusPin, OUTPUT);
-    digitalWrite(this->_statusPin, IOTWEBCONF_STATUS_ON);
+    digitalWrite(this->_statusPin, ESPWIFI_STATUS_ON);
   }
 
   // -- Load configuration from EEPROM.
@@ -124,7 +124,7 @@ boolean ESPWIFI::init()
     this->_apPassword[0] = '\0';
     this->_wifiSsid[0] = '\0';
     this->_wifiPassword[0] = '\0';
-    this->_apTimeoutMs = IOTWEBCONF_DEFAULT_AP_MODE_TIMEOUT_MS;
+    this->_apTimeoutMs = ESPWIFI_DEFAULT_AP_MODE_TIMEOUT_MS;
   }
   else
   {
@@ -137,7 +137,7 @@ boolean ESPWIFI::init()
 #elif defined(ESP32)
   WiFi.setHostname(this->_thingName);
 #endif
-#ifdef IOTWEBCONF_CONFIG_USE_MDNS
+#ifdef ESPWIFI_CONFIG_USE_MDNS
   MDNS.begin(this->_thingName);
   MDNS.addService("http", "tcp", 80);
 #endif
@@ -147,10 +147,10 @@ boolean ESPWIFI::init()
 
 //////////////////////////////////////////////////////////////////
 
-bool ESPWIFI::addParameter(IotWebConfParameter* parameter)
+bool ESPWIFI::addParameter(EspWifiParameter* parameter)
 {
 /*
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
   Serial.print("Adding parameter '");
   Serial.print(parameter->getId());
   Serial.println("'");
@@ -159,10 +159,10 @@ bool ESPWIFI::addParameter(IotWebConfParameter* parameter)
   if (this->_firstParameter == NULL)
   {
     this->_firstParameter = parameter;
-//    IOTWEBCONF_DEBUG_LINE(F("Adding as first"));
+//    ESPWIFI_DEBUG_LINE(F("Adding as first"));
     return true;
   }
-  IotWebConfParameter* current = this->_firstParameter;
+  EspWifiParameter* current = this->_firstParameter;
   while (current->_nextParameter != NULL)
   {
     current = current->_nextParameter;
@@ -175,19 +175,19 @@ bool ESPWIFI::addParameter(IotWebConfParameter* parameter)
 void ESPWIFI::configInit()
 {
   int size = 0;
-  IotWebConfParameter* current = this->_firstParameter;
+  EspWifiParameter* current = this->_firstParameter;
   while (current != NULL)
   {
     size += current->getLength();
     current = current->_nextParameter;
   }
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
   Serial.print("Config size: ");
   Serial.println(size);
 #endif
 
   EEPROM.begin(
-      IOTWEBCONF_CONFIG_START + IOTWEBCONF_CONFIG_VESION_LENGTH + size);
+      ESPWIFI_CONFIG_START + ESPWIFI_CONFIG_VESION_LENGTH + size);
 }
 
 /**
@@ -197,28 +197,28 @@ boolean ESPWIFI::configLoad()
 {
   if (this->configTestVersion())
   {
-    IotWebConfParameter* current = this->_firstParameter;
-    int start = IOTWEBCONF_CONFIG_START + IOTWEBCONF_CONFIG_VESION_LENGTH;
+    EspWifiParameter* current = this->_firstParameter;
+    int start = ESPWIFI_CONFIG_START + ESPWIFI_CONFIG_VESION_LENGTH;
     while (current != NULL)
     {
       if (current->getId() != NULL)
       {
         this->readEepromValue(start, current->valueBuffer, current->getLength());
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
         const char* defaultMarker = "";
 #endif
         if ((strlen(current->valueBuffer) == 0) && (current->defaultValue != NULL))
         {
           strncpy(current->valueBuffer, current->defaultValue, current->getLength());
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
           defaultMarker = " (using default)";
 #endif
         }
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
         Serial.print("Loaded config '");
         Serial.print(current->getId());
         Serial.print("'= ");
-# ifdef IOTWEBCONF_DEBUG_PWD_TO_SERIAL
+# ifdef ESPWIFI_DEBUG_PWD_TO_SERIAL
         Serial.print("'");
         Serial.print(current->valueBuffer);
         Serial.print("'");
@@ -247,7 +247,7 @@ boolean ESPWIFI::configLoad()
   }
   else
   {
-    IOTWEBCONF_DEBUG_LINE(F("Wrong config version."));
+    ESPWIFI_DEBUG_LINE(F("Wrong config version."));
     return false;
   }
 }
@@ -255,17 +255,17 @@ boolean ESPWIFI::configLoad()
 void ESPWIFI::configSave()
 {
   this->configSaveConfigVersion();
-  IotWebConfParameter* current = this->_firstParameter;
-  int start = IOTWEBCONF_CONFIG_START + IOTWEBCONF_CONFIG_VESION_LENGTH;
+  EspWifiParameter* current = this->_firstParameter;
+  int start = ESPWIFI_CONFIG_START + ESPWIFI_CONFIG_VESION_LENGTH;
   while (current != NULL)
   {
     if (current->getId() != NULL)
     {
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
       Serial.print("Saving config '");
       Serial.print(current->getId());
       Serial.print("'= ");
-# ifdef IOTWEBCONF_DEBUG_PWD_TO_SERIAL
+# ifdef ESPWIFI_DEBUG_PWD_TO_SERIAL
       Serial.print("'");
       Serial.print(current->valueBuffer);
       Serial.println("'");
@@ -315,9 +315,9 @@ void ESPWIFI::writeEepromValue(int start, char* valueBuffer, int length)
 
 boolean ESPWIFI::configTestVersion()
 {
-  for (byte t = 0; t < IOTWEBCONF_CONFIG_VESION_LENGTH; t++)
+  for (byte t = 0; t < ESPWIFI_CONFIG_VESION_LENGTH; t++)
   {
-    if (EEPROM.read(IOTWEBCONF_CONFIG_START + t) != this->_configVersion[t])
+    if (EEPROM.read(ESPWIFI_CONFIG_START + t) != this->_configVersion[t])
     {
       return false;
     }
@@ -327,9 +327,9 @@ boolean ESPWIFI::configTestVersion()
 
 void ESPWIFI::configSaveConfigVersion()
 {
-  for (byte t = 0; t < IOTWEBCONF_CONFIG_VESION_LENGTH; t++)
+  for (byte t = 0; t < ESPWIFI_CONFIG_VESION_LENGTH; t++)
   {
-    EEPROM.write(IOTWEBCONF_CONFIG_START + t, this->_configVersion[t]);
+    EEPROM.write(ESPWIFI_CONFIG_START + t, this->_configVersion[t]);
   }
 }
 
@@ -357,13 +357,13 @@ void ESPWIFI::setWifiConnectionTimeoutMs(unsigned long millis)
 
 void ESPWIFI::handleConfig()
 {
-  if (this->_state == IOTWEBCONF_STATE_ONLINE)
+  if (this->_state == ESPWIFI_STATE_ONLINE)
   {
     // -- Authenticate
     if (!this->_server->authenticate(
-            IOTWEBCONF_ADMIN_USER_NAME, this->_apPassword))
+            ESPWIFI_ADMIN_USER_NAME, this->_apPassword))
     {
-      IOTWEBCONF_DEBUG_LINE(F("Requesting authentication."));
+      ESPWIFI_DEBUG_LINE(F("Requesting authentication."));
       this->_server->requestAuthentication();
       return;
     }
@@ -372,7 +372,7 @@ void ESPWIFI::handleConfig()
   if (!this->_server->hasArg("iotSave") || !this->validateForm())
   {
     // -- Display config portal
-    IOTWEBCONF_DEBUG_LINE(F("Configuration page requested."));
+    ESPWIFI_DEBUG_LINE(F("Configuration page requested."));
     String page = htmlFormatProvider->getHead();
     page.replace("{v}", "Config ESP");
     page += htmlFormatProvider->getScript();
@@ -383,12 +383,12 @@ void ESPWIFI::handleConfig()
     page += htmlFormatProvider->getFormStart();
     char parLength[5];
     // -- Add parameters to the form
-    IotWebConfParameter* current = this->_firstParameter;
+    EspWifiParameter* current = this->_firstParameter;
     while (current != NULL)
     {
       if (current->getId() == NULL)
       {
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
         Serial.println("Rendering separator");
 #endif
         page += "</fieldset><fieldset>";
@@ -401,11 +401,11 @@ void ESPWIFI::handleConfig()
       }
       else if (current->visible)
       {
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
         Serial.print("Rendering '");
         Serial.print(current->getId());
         Serial.print("' with value: ");
-# ifdef IOTWEBCONF_DEBUG_PWD_TO_SERIAL
+# ifdef ESPWIFI_DEBUG_PWD_TO_SERIAL
         Serial.println(current->valueBuffer);
 # else
         if (strcmp("password", current->type) == 0)
@@ -487,31 +487,31 @@ void ESPWIFI::handleConfig()
   else
   {
     // -- Save config
-    IOTWEBCONF_DEBUG_LINE(F("Updating configuration"));
-    char temp[IOTWEBCONF_WORD_LEN];
+    ESPWIFI_DEBUG_LINE(F("Updating configuration"));
+    char temp[ESPWIFI_WORD_LEN];
 
-    IotWebConfParameter* current = this->_firstParameter;
+    EspWifiParameter* current = this->_firstParameter;
     while (current != NULL)
     {
       if ((current->getId() != NULL) && (current->visible))
       {
         if ((strcmp("password", current->type) == 0) &&
-            (current->getLength() <= IOTWEBCONF_WORD_LEN))
+            (current->getLength() <= ESPWIFI_WORD_LEN))
         {
-          // TODO: Passwords longer than IOTWEBCONF_WORD_LEN not supported.
+          // TODO: Passwords longer than ESPWIFI_WORD_LEN not supported.
           this->readParamValue(current->getId(), temp, current->getLength());
           if (temp[0] != '\0')
           {
             // -- Value was set.
             strncpy(current->valueBuffer, temp, current->getLength());
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
             Serial.print(current->getId());
             Serial.println(" was set");
 #endif
           }
           else
           {
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
             Serial.print(current->getId());
             Serial.println(" was not changed");
 #endif
@@ -521,10 +521,10 @@ void ESPWIFI::handleConfig()
         {
           this->readParamValue(
               current->getId(), current->valueBuffer, current->getLength());
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
           Serial.print(current->getId());
           Serial.print("='");
-# ifdef IOTWEBCONF_DEBUG_PWD_TO_SERIAL
+# ifdef ESPWIFI_DEBUG_PWD_TO_SERIAL
           Serial.print(current->valueBuffer);
 # else
           if (strcmp("password", current->type) == 0)
@@ -564,7 +564,7 @@ void ESPWIFI::handleConfig()
       page += F("You must provide the local wifi settings to continue. Return "
                 "to <a href=''>configuration page</a>.");
     }
-    else if (this->_state == IOTWEBCONF_STATE_NOT_CONFIGURED)
+    else if (this->_state == ESPWIFI_STATE_NOT_CONFIGURED)
     {
       page += F("Please disconnect from WiFi AP to continue!");
     }
@@ -583,7 +583,7 @@ void ESPWIFI::readParamValue(
     const char* paramName, char* target, unsigned int len)
 {
   String value = this->_server->arg(paramName);
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
   Serial.print("Value of arg '");
   Serial.print(paramName);
   Serial.print("' is:");
@@ -595,7 +595,7 @@ void ESPWIFI::readParamValue(
 boolean ESPWIFI::validateForm()
 {
   // -- Clean previous error messages.
-  IotWebConfParameter* current = this->_firstParameter;
+  EspWifiParameter* current = this->_firstParameter;
   while (current != NULL)
   {
     current->errorMessage = NULL;
@@ -642,7 +642,7 @@ void ESPWIFI::handleNotFound()
     // If captive portal redirect instead of displaying the error page.
     return;
   }
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
   Serial.print("Requested non-existing page '");
   Serial.print(this->_server->uri());
   Serial.print("' arguments(");
@@ -684,7 +684,7 @@ boolean ESPWIFI::handleCaptivePortal()
   thingName.toLowerCase();
   if (!isIp(host) && !host.startsWith(thingName))
   {
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
     Serial.print("Request for ");
     Serial.print(host);
     Serial.print(" redirected to ");
@@ -742,30 +742,30 @@ void ESPWIFI::doLoop()
 {
   doBlink();
   yield(); // -- Yield should not be necessary, but cannot hurt eather.
-  if (this->_state == IOTWEBCONF_STATE_BOOT)
+  if (this->_state == ESPWIFI_STATE_BOOT)
   {
     // -- After boot, fall immediately to AP mode.
-    byte startupState = IOTWEBCONF_STATE_AP_MODE;
+    byte startupState = ESPWIFI_STATE_AP_MODE;
     if (this->_skipApStartup)
     {
       if (isWifiModePossible())
       {
-        IOTWEBCONF_DEBUG_LINE(
+        ESPWIFI_DEBUG_LINE(
             F("SkipApStartup is requested, but either no WiFi was set up, or "
               "configButton was pressed."));
       }
       else
       {
         // -- Startup state can be WiFi, if it is requested and also possible.
-        IOTWEBCONF_DEBUG_LINE(F("SkipApStartup mode was applied"));
-        startupState = IOTWEBCONF_STATE_CONNECTING;
+        ESPWIFI_DEBUG_LINE(F("SkipApStartup mode was applied"));
+        startupState = ESPWIFI_STATE_CONNECTING;
       }
     }
     this->changeState(startupState);
   }
   else if (
-      (this->_state == IOTWEBCONF_STATE_NOT_CONFIGURED) ||
-      (this->_state == IOTWEBCONF_STATE_AP_MODE))
+      (this->_state == ESPWIFI_STATE_NOT_CONFIGURED) ||
+      (this->_state == ESPWIFI_STATE_AP_MODE))
   {
     // -- We must only leave the AP mode, when no slaves are connected.
     // -- Other than that AP mode has a timeout. E.g. after boot, or when retry
@@ -775,23 +775,23 @@ void ESPWIFI::doLoop()
     this->_dnsServer->processNextRequest();
     this->_server->handleClient();
   }
-  else if (this->_state == IOTWEBCONF_STATE_CONNECTING)
+  else if (this->_state == ESPWIFI_STATE_CONNECTING)
   {
     if (checkWifiConnection())
     {
-      this->changeState(IOTWEBCONF_STATE_ONLINE);
+      this->changeState(ESPWIFI_STATE_ONLINE);
       return;
     }
   }
-  else if (this->_state == IOTWEBCONF_STATE_ONLINE)
+  else if (this->_state == ESPWIFI_STATE_ONLINE)
   {
     // -- In server mode we provide web interface. And check whether it is time
     // to run the client.
     this->_server->handleClient();
     if (WiFi.status() != WL_CONNECTED)
     {
-      IOTWEBCONF_DEBUG_LINE(F("Not connected. Try reconnect..."));
-      this->changeState(IOTWEBCONF_STATE_CONNECTING);
+      ESPWIFI_DEBUG_LINE(F("Not connected. Try reconnect..."));
+      this->changeState(ESPWIFI_STATE_CONNECTING);
       return;
     }
   }
@@ -804,13 +804,13 @@ void ESPWIFI::changeState(byte newState)
 {
   switch (newState)
   {
-    case IOTWEBCONF_STATE_AP_MODE:
+    case ESPWIFI_STATE_AP_MODE:
     {
       // -- In AP mode we must override the default AP password. Otherwise we stay
       // in STATE_NOT_CONFIGURED.
       if (isWifiModePossible())
       {
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
         if (this->_forceDefaultPassword)
         {
           Serial.println("AP mode forced by reset pin");
@@ -820,14 +820,14 @@ void ESPWIFI::changeState(byte newState)
           Serial.println("AP password was not set in configuration");
         }
 #endif
-        newState = IOTWEBCONF_STATE_NOT_CONFIGURED;
+        newState = ESPWIFI_STATE_NOT_CONFIGURED;
       }
       break;
     }
     default:
       break;
   }
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
   Serial.print("State changing from: ");
   Serial.print(this->_state);
   Serial.print(" to ");
@@ -836,7 +836,7 @@ void ESPWIFI::changeState(byte newState)
   byte oldState = this->_state;
   this->_state = newState;
   this->stateChanged(oldState, newState);
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
   Serial.print("State changed from: ");
   Serial.print(oldState);
   Serial.print(" to ");
@@ -852,9 +852,9 @@ void ESPWIFI::stateChanged(byte oldState, byte newState)
 //  updateOutput();
   switch (newState)
   {
-    case IOTWEBCONF_STATE_AP_MODE:
-    case IOTWEBCONF_STATE_NOT_CONFIGURED:
-      if (newState == IOTWEBCONF_STATE_AP_MODE)
+    case ESPWIFI_STATE_AP_MODE:
+    case ESPWIFI_STATE_NOT_CONFIGURED:
+      if (newState == ESPWIFI_STATE_AP_MODE)
       {
         this->blinkInternal(300, 90);
       }
@@ -868,20 +868,20 @@ void ESPWIFI::stateChanged(byte oldState, byte newState)
         this->_updateServer->setup(this->_server, this->_updatePath);
       }
       this->_server->begin();
-      this->_apConnectionStatus = IOTWEBCONF_AP_CONNECTION_STATE_NC;
+      this->_apConnectionStatus = ESPWIFI_AP_CONNECTION_STATE_NC;
       this->_apStartTimeMs = millis();
       break;
-    case IOTWEBCONF_STATE_CONNECTING:
-      if ((oldState == IOTWEBCONF_STATE_AP_MODE) ||
-          (oldState == IOTWEBCONF_STATE_NOT_CONFIGURED))
+    case ESPWIFI_STATE_CONNECTING:
+      if ((oldState == ESPWIFI_STATE_AP_MODE) ||
+          (oldState == ESPWIFI_STATE_NOT_CONFIGURED))
       {
         stopAp();
       }
       this->blinkInternal(1000, 50);
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
       Serial.print("Connecting to [");
       Serial.print(this->_wifiAuthInfo.ssid);
-# ifdef IOTWEBCONF_DEBUG_PWD_TO_SERIAL
+# ifdef ESPWIFI_DEBUG_PWD_TO_SERIAL
       Serial.print("] with password [");
       Serial.print(this->_wifiAuthInfo.password);
       Serial.println("]");
@@ -893,15 +893,15 @@ void ESPWIFI::stateChanged(byte oldState, byte newState)
       this->_wifiConnectionHandler(
           this->_wifiAuthInfo.ssid, this->_wifiAuthInfo.password);
       break;
-    case IOTWEBCONF_STATE_ONLINE:
+    case ESPWIFI_STATE_ONLINE:
       this->blinkInternal(8000, 2);
       if (this->_updateServer != NULL)
       {
         this->_updateServer->updateCredentials(
-            IOTWEBCONF_ADMIN_USER_NAME, this->_apPassword);
+            ESPWIFI_ADMIN_USER_NAME, this->_apPassword);
       }
       this->_server->begin();
-      IOTWEBCONF_DEBUG_LINE(F("Accepting connection"));
+      ESPWIFI_DEBUG_LINE(F("Accepting connection"));
       if (this->_wifiConnectionCallback != NULL)
       {
         this->_wifiConnectionCallback();
@@ -918,11 +918,11 @@ void ESPWIFI::checkApTimeout()
       (!this->_forceDefaultPassword))
   {
     // -- Only move on, when we have a valid WifF and AP configured.
-    if ((this->_apConnectionStatus == IOTWEBCONF_AP_CONNECTION_STATE_DC) ||
+    if ((this->_apConnectionStatus == ESPWIFI_AP_CONNECTION_STATE_DC) ||
         ((this->_apTimeoutMs < millis() - this->_apStartTimeMs) &&
-         (this->_apConnectionStatus != IOTWEBCONF_AP_CONNECTION_STATE_C)))
+         (this->_apConnectionStatus != ESPWIFI_AP_CONNECTION_STATE_C)))
     {
-      this->changeState(IOTWEBCONF_STATE_CONNECTING);
+      this->changeState(ESPWIFI_STATE_CONNECTING);
     }
   }
 }
@@ -934,21 +934,21 @@ void ESPWIFI::checkApTimeout()
  */
 void ESPWIFI::checkConnection()
 {
-  if ((this->_apConnectionStatus == IOTWEBCONF_AP_CONNECTION_STATE_NC) &&
+  if ((this->_apConnectionStatus == ESPWIFI_AP_CONNECTION_STATE_NC) &&
       (WiFi.softAPgetStationNum() > 0))
   {
-    this->_apConnectionStatus = IOTWEBCONF_AP_CONNECTION_STATE_C;
-    IOTWEBCONF_DEBUG_LINE(F("Connection to AP."));
+    this->_apConnectionStatus = ESPWIFI_AP_CONNECTION_STATE_C;
+    ESPWIFI_DEBUG_LINE(F("Connection to AP."));
   }
   else if (
-      (this->_apConnectionStatus == IOTWEBCONF_AP_CONNECTION_STATE_C) &&
+      (this->_apConnectionStatus == ESPWIFI_AP_CONNECTION_STATE_C) &&
       (WiFi.softAPgetStationNum() == 0))
   {
-    this->_apConnectionStatus = IOTWEBCONF_AP_CONNECTION_STATE_DC;
-    IOTWEBCONF_DEBUG_LINE(F("Disconnected from AP."));
+    this->_apConnectionStatus = ESPWIFI_AP_CONNECTION_STATE_DC;
+    ESPWIFI_DEBUG_LINE(F("Disconnected from AP."));
     if (this->_forceDefaultPassword)
     {
-      IOTWEBCONF_DEBUG_LINE(F("Releasing forced AP mode."));
+      ESPWIFI_DEBUG_LINE(F("Releasing forced AP mode."));
       this->_forceDefaultPassword = false;
     }
   }
@@ -961,26 +961,26 @@ boolean ESPWIFI::checkWifiConnection()
     if (this->_wifiConnectionTimeoutMs < millis() - this->_wifiConnectionStart)
     {
       // -- WiFi not available, fall back to AP mode.
-      IOTWEBCONF_DEBUG_LINE(F("Giving up."));
+      ESPWIFI_DEBUG_LINE(F("Giving up."));
       WiFi.disconnect(true);
-      IotWebConfWifiAuthInfo* newWifiAuthInfo = _wifiConnectionFailureHandler();
+      EspWifiWifiAuthInfo* newWifiAuthInfo = _wifiConnectionFailureHandler();
       if (newWifiAuthInfo != NULL)
       {
         // -- Try connecting with another connection info.
         this->_wifiAuthInfo.ssid = newWifiAuthInfo->ssid;
         this->_wifiAuthInfo.password = newWifiAuthInfo->password;
-        this->changeState(IOTWEBCONF_STATE_CONNECTING);
+        this->changeState(ESPWIFI_STATE_CONNECTING);
       }
       else
       {
-        this->changeState(IOTWEBCONF_STATE_AP_MODE);
+        this->changeState(ESPWIFI_STATE_AP_MODE);
       }
     }
     return false;
   }
 
   // -- Connected
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
   Serial.println("WiFi connected");
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
@@ -993,15 +993,15 @@ void ESPWIFI::setupAp()
 {
   WiFi.mode(WIFI_AP);
 
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
   Serial.print("Setting up AP: ");
   Serial.println(this->_thingName);
 #endif
-  if (this->_state == IOTWEBCONF_STATE_NOT_CONFIGURED)
+  if (this->_state == ESPWIFI_STATE_NOT_CONFIGURED)
   {
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
     Serial.print("With default password: ");
-# ifdef IOTWEBCONF_DEBUG_PWD_TO_SERIAL
+# ifdef ESPWIFI_DEBUG_PWD_TO_SERIAL
     Serial.println(this->_initialApPassword);
 # else
     Serial.println(F("<hidden>"));
@@ -1011,9 +1011,9 @@ void ESPWIFI::setupAp()
   }
   else
   {
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
     Serial.print("Use password: ");
-# ifdef IOTWEBCONF_DEBUG_PWD_TO_SERIAL
+# ifdef ESPWIFI_DEBUG_PWD_TO_SERIAL
     Serial.println(this->_apPassword);
 # else
     Serial.println(F("<hidden>"));
@@ -1022,7 +1022,7 @@ void ESPWIFI::setupAp()
     this->_apConnectionHandler(this->_thingName, this->_apPassword);
   }
 
-#ifdef IOTWEBCONF_DEBUG_TO_SERIAL
+#ifdef ESPWIFI_DEBUG_TO_SERIAL
   Serial.print(F("AP IP address: "));
   Serial.println(WiFi.softAPIP());
 #endif
@@ -1032,7 +1032,7 @@ void ESPWIFI::setupAp()
 
   /* Setup the DNS server redirecting all the domains to the apIP */
   this->_dnsServer->setErrorReplyCode(DNSReplyCode::NoError);
-  this->_dnsServer->start(IOTWEBCONF_DNS_PORT, "*", WiFi.softAPIP());
+  this->_dnsServer->start(ESPWIFI_DNS_PORT, "*", WiFi.softAPIP());
 }
 
 void ESPWIFI::stopAp()
@@ -1077,7 +1077,7 @@ void ESPWIFI::blinkInternal(unsigned long repeatMs, byte dutyCyclePercent)
 
 void ESPWIFI::doBlink()
 {
-  if (IOTWEBCONF_STATUS_ENABLED)
+  if (ESPWIFI_STATUS_ENABLED)
   {
     unsigned long now = millis();
     unsigned long delayMs =
@@ -1099,7 +1099,7 @@ void ESPWIFI::connectWifi(const char* ssid, const char* password)
 {
   WiFi.begin(ssid, password);
 }
-IotWebConfWifiAuthInfo* ESPWIFI::handleConnectWifiFailure()
+EspWifiWifiAuthInfo* ESPWIFI::handleConnectWifiFailure()
 {
   return NULL;
 }
