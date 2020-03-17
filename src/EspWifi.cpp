@@ -187,7 +187,7 @@ void EspWifi::configInit()
 #endif
 
   EEPROM.begin(
-      ESPWIFI_CONFIG_START + ESPWIFI_CONFIG_VESION_LENGTH + size);
+      ESPWIFI_CONFIG_START + ESPWIFI_CONFIG_VERSION_LENGTH + size);
 }
 
 /**
@@ -198,7 +198,7 @@ boolean EspWifi::configLoad()
   if (this->configTestVersion())
   {
     EspWifiParameter* current = this->_firstParameter;
-    int start = ESPWIFI_CONFIG_START + ESPWIFI_CONFIG_VESION_LENGTH;
+    int start = ESPWIFI_CONFIG_START + ESPWIFI_CONFIG_VERSION_LENGTH;
     while (current != NULL)
     {
       if (current->getId() != NULL)
@@ -226,7 +226,7 @@ boolean EspWifi::configLoad()
 # else
         if (strcmp("password", current->type) == 0)
         {
-          Serial.print(F("<hidden>"));
+          Serial.println(F("<hidden>"));
           Serial.println(defaultMarker);
         }
         else
@@ -256,7 +256,7 @@ void EspWifi::configSave()
 {
   this->configSaveConfigVersion();
   EspWifiParameter* current = this->_firstParameter;
-  int start = ESPWIFI_CONFIG_START + ESPWIFI_CONFIG_VESION_LENGTH;
+  int start = ESPWIFI_CONFIG_START + ESPWIFI_CONFIG_VERSION_LENGTH;
   while (current != NULL)
   {
     if (current->getId() != NULL)
@@ -315,7 +315,7 @@ void EspWifi::writeEepromValue(int start, char* valueBuffer, int length)
 
 boolean EspWifi::configTestVersion()
 {
-  for (byte t = 0; t < ESPWIFI_CONFIG_VESION_LENGTH; t++)
+  for (byte t = 0; t < ESPWIFI_CONFIG_VERSION_LENGTH; t++)
   {
     if (EEPROM.read(ESPWIFI_CONFIG_START + t) != this->_configVersion[t])
     {
@@ -327,7 +327,7 @@ boolean EspWifi::configTestVersion()
 
 void EspWifi::configSaveConfigVersion()
 {
-  for (byte t = 0; t < ESPWIFI_CONFIG_VESION_LENGTH; t++)
+  for (byte t = 0; t < ESPWIFI_CONFIG_VERSION_LENGTH; t++)
   {
     EEPROM.write(ESPWIFI_CONFIG_START + t, this->_configVersion[t]);
   }
@@ -427,7 +427,7 @@ void EspWifi::handleConfig()
           pitem.replace("{t}", current->type);
           pitem.replace("{i}", current->getId());
           pitem.replace("{p}", current->placeholder == NULL ? "" : current->placeholder);
-          snprintf(parLength, 5, "%d", current->getLength());
+          snprintf(parLength, 5, "%d", current->getLength()-1);
           pitem.replace("{l}", parLength);
           if (strcmp("password", current->type) == 0)
           {
@@ -535,10 +535,9 @@ void EspWifi::handleConfig()
           {
             Serial.print(current->valueBuffer);
           }
-# endif
-          Serial.print(current->valueBuffer);
-          Serial.println("'");
-#endif
+        # endif
+                  Serial.println("'");
+        #endif
         }
       }
       current = current->_nextParameter;
@@ -735,6 +734,9 @@ void EspWifi::delay(unsigned long m)
     this->doLoop();
     delay(1); // -- Note: 1ms might not be enough to perform a full yield. So
               // 'yeild' in 'doLoop' is eventually a good idea.
+    #else
+      delayMicroseconds(1000);
+    #endif
   }
 }
 
@@ -748,7 +750,7 @@ void EspWifi::doLoop()
     byte startupState = ESPWIFI_STATE_AP_MODE;
     if (this->_skipApStartup)
     {
-      if (isWifiModePossible())
+      if (mustStayInApMode())
       {
         ESPWIFI_DEBUG_LINE(
             F("SkipApStartup is requested, but either no WiFi was set up, or "
@@ -808,7 +810,7 @@ void EspWifi::changeState(byte newState)
     {
       // -- In AP mode we must override the default AP password. Otherwise we stay
       // in STATE_NOT_CONFIGURED.
-      if (isWifiModePossible())
+      if (mustUseDefaultPassword())
       {
 #ifdef ESPWIFI_DEBUG_TO_SERIAL
         if (this->_forceDefaultPassword)
@@ -914,8 +916,7 @@ void EspWifi::stateChanged(byte oldState, byte newState)
 
 void EspWifi::checkApTimeout()
 {
-  if ((this->_wifiSsid[0] != '\0') && (this->_apPassword[0] != '\0') &&
-      (!this->_forceDefaultPassword))
+  if ( !mustStayInApMode() )
   {
     // -- Only move on, when we have a valid WifF and AP configured.
     if ((this->_apConnectionStatus == ESPWIFI_AP_CONNECTION_STATE_DC) ||
@@ -1090,6 +1091,42 @@ void EspWifi::doBlink()
     }
   }
 }
+
+void EspWifi::forceApMode(boolean doForce)
+{
+  if (this->_forceApMode == doForce)
+  {
+     // Already in the requested mode;
+    return;
+  }
+
+  this->_forceApMode = doForce;
+  if (doForce)
+  {
+    if (this->_state != ESPWIFI_STATE_AP_MODE)
+    {
+      ESPWIFI_DEBUG_LINE(F("Start forcing AP mode"));
+      WiFi.disconnect(true);
+      this->changeState(ESPWIFI_STATE_AP_MODE);
+    }
+  }
+  else
+  {
+    if (this->_state == ESPWIFI_STATE_AP_MODE)
+    {
+      if (this->mustStayInApMode())
+      {
+        ESPWIFI_DEBUG_LINE(F("Requested stopping to force AP mode, but we cannot leave the AP mode now."));
+      }
+      else
+      {
+        ESPWIFI_DEBUG_LINE(F("Stopping AP mode force."));
+        this->changeState(ESPWIFI_STATE_CONNECTING);
+      }
+
+    }
+  }
+};
 
 boolean EspWifi::connectAp(const char* apName, const char* password)
 {

@@ -47,7 +47,7 @@
 #endif
 
 // -- EEPROM config starts with a special prefix of length defined here.
-#define ESPWIFI_CONFIG_VESION_LENGTH 4
+#define ESPWIFI_CONFIG_VERSION_LENGTH 4
 #define ESPWIFI_DNS_PORT 53
 
 // -- HTML page fragments
@@ -410,11 +410,20 @@ public:
 
   /**
    * By default EspWifi starts up in AP mode. Calling this method before the init will force EspWifi
-   * to connect immediatelly to the configured WiFi network.
+   * to connect immediately to the configured WiFi network.
    * Note, this method only takes effect, when WiFi mode is enabled, thus when a valid WiFi connection is
    * set up, and AP mode is not forced by ConfigPin (see setConfigPin() for details).
    */
   void skipApStartup() { this->_skipApStartup = true; }
+
+  /**
+   * By default IotWebConf will continue startup in WiFi mode, when no configuration request arrived
+   * in AP mode. With this method holding the AP mode can be forced.
+   * Further more, instant AP mode can forced even when we are currently in WiFi mode. 
+   *   @value - When parameter is TRUE AP mode is forced/entered.
+   *     When value is FALSE normal operation will continue.
+   */
+  void forceApMode(boolean value);
 
   /**
    * Get internal parameters, for manual handling.
@@ -475,6 +484,7 @@ private:
   const char* _updatePath = NULL;
   boolean _forceDefaultPassword = false;
   boolean _skipApStartup = false;
+  boolean _forceApMode = false;
   EspWifiParameter* _firstParameter = NULL;
   EspWifiParameter _thingNameParameter;
   EspWifiParameter _apPasswordParameter;
@@ -524,9 +534,14 @@ private:
 
   void changeState(byte newState);
   void stateChanged(byte oldState, byte newState);
-  boolean isWifiModePossible()
+  boolean mustUseDefaultPassword()
   {
     return this->_forceDefaultPassword || (this->_apPassword[0] == '\0');
+  }
+  boolean mustStayInApMode()
+  {
+    return this->_forceDefaultPassword || (this->_apPassword[0] == '\0') ||
+      this->_wifiSsid[0] == '\0' || this->_forceApMode;
   }
   boolean isIp(String str);
   String toStringIp(IPAddress ip);
