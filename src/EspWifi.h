@@ -21,7 +21,7 @@
 // ssid, password).
 #define ESPWIFI_WORD_LEN 33
 
-// -- ESPWIFI tries to connect to the local network for an amount of time
+// -- EspWifi tries to connect to the local network for an amount of time
 // before falling back to AP mode.
 #define ESPWIFI_DEFAULT_WIFI_CONNECTION_TIMEOUT_MS 30000
 
@@ -196,7 +196,7 @@ protected:
 /**
  * Main class of the module.
  */
-class ESPWIFI
+class EspWifi
 {
 public:
   /**
@@ -208,7 +208,7 @@ public:
    *   @configVersion - When the software is updated and the configuration is changing, this key should also be changed,
    *     so that the config portal will force the user to reenter all the configuration values.
    */
-  ESPWIFI(
+  EspWifi(
       const char* thingName, DNSServer* dnsServer, WebServer* server,
       const char* initialApPassword, const char* configVersion = "init");
 
@@ -246,14 +246,14 @@ public:
       HTTPUpdateServer* updateServer, const char* updatePath = "/firmware");
 
   /**
-   * Start up the ESPWIFI module.
+   * Start up the EspWifi module.
    * Loads all configuration from the EEPROM, and initialize the system.
    * Will return false, if no configuration (with specified config version) was found in the EEPROM.
    */
   boolean init();
 
   /**
-   * ESPWIFI is a non-blocking, state controlled system. Therefor it should be
+   * EspWifi is a non-blocking, state controlled system. Therefor it should be
    * regularly triggered from the user code.
    * So call this method any time you can.
    */
@@ -295,7 +295,7 @@ public:
   void setFormValidator(std::function<boolean()> func);
 
   /**
-   * Specify your custom Access Point connection handler. Please use ESPWIFI::connectAp() as
+   * Specify your custom Access Point connection handler. Please use EspWifi::connectAp() as
    * reference when implementing your custom solution.
    */
   void setApConnectionHandler(
@@ -305,7 +305,7 @@ public:
   }
 
   /**
-   * Specify your custom WiFi connection handler. Please use ESPWIFI::connectWifi() as
+   * Specify your custom WiFi connection handler. Please use EspWifi::connectWifi() as
    * reference when implementing your custom solution.
    */
   void setWifiConnectionHandler(
@@ -318,7 +318,7 @@ public:
    * With this method you can specify your custom WiFi timeout handler.
    * This hander can manage what should happen, when WiFi connection timed out.
    * By default the handler implementation returns with NULL, as seen on reference implementation
-   * ESPWIFI::handleConnectWifiFailure(). This means we need to fall back to AP mode.
+   * EspWifi::handleConnectWifiFailure(). This means we need to fall back to AP mode.
    * If it method returns with a (new) WiFi settings, it is used as a next try.
    * Note, that this feature is provided because of a possible future option of providing multiply
    * WiFi settings.
@@ -329,7 +329,7 @@ public:
   }
 
   /**
-   * Add a custom parameter, that will be handled by the ESPWIFI module.
+   * Add a custom parameter, that will be handled by the EspWifi module.
    * The parameter will be saved to/loaded from EEPROM automatically,
    * and will appear on the config portal.
    * Will return false, if adding was not successful.
@@ -343,12 +343,12 @@ public:
   char* getThingName();
 
   /**
-   * Use this delay, to prevent blocking ESPWIFI.
+   * Use this delay, to prevent blocking EspWifi.
    */
   void delay(unsigned long millis);
 
   /**
-   * ESPWIFI tries to connect to the local network for an amount of time before falling back to AP mode.
+   * EspWifi tries to connect to the local network for an amount of time before falling back to AP mode.
    * The default amount can be updated with this setter.
    * Should be called before init()!
    */
@@ -409,7 +409,7 @@ public:
   };
 
   /**
-   * By default ESPWIFI starts up in AP mode. Calling this method before the init will force ESPWIFI
+   * By default EspWifi starts up in AP mode. Calling this method before the init will force EspWifi
    * to connect immediatelly to the configured WiFi network.
    * Note, this method only takes effect, when WiFi mode is enabled, thus when a valid WiFi connection is
    * set up, and AP mode is not forced by ConfigPin (see setConfigPin() for details).
@@ -496,11 +496,11 @@ private:
   std::function<void()> _configSavedCallback = NULL;
   std::function<boolean()> _formValidator = NULL;
   std::function<void(const char*, const char*)> _apConnectionHandler =
-      &(ESPWIFI::connectAp);
+      &(EspWifi::connectAp);
   std::function<void(const char*, const char*)> _wifiConnectionHandler =
-      &(ESPWIFI::connectWifi);
+      &(EspWifi::connectWifi);
   std::function<EspWifiAuthInfo*()> _wifiConnectionFailureHandler =
-      &(ESPWIFI::handleConnectWifiFailure);
+      &(EspWifi::handleConnectWifiFailure);
   unsigned long _internalBlinkOnMs = 500;
   unsigned long _internalBlinkOffMs = 500;
   unsigned long _blinkOnMs = 500;

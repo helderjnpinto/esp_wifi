@@ -14,7 +14,7 @@
  *     button should be attached to GND.
  */
 
-#include <ESPWIFI.h>
+#include <EspWifi.h>
 
 // -- Initial name of the Thing. Used e.g. as SSID of the own Access Point.
 const char thingName[] = "testThing";
@@ -50,7 +50,7 @@ char ipAddressValue[STRING_LEN];
 char gatewayValue[STRING_LEN];
 char netmaskValue[STRING_LEN];
 
-ESPWIFI espWifi(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
+EspWifi espWifi(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
 EspWifiParameter ipAddressParam = EspWifiParameter("IP address", "ipAddress", ipAddressValue, STRING_LEN, "text", NULL, "192.168.3.222");
 EspWifiParameter gatewayParam = EspWifiParameter("Gateway", "gateway", gatewayValue, STRING_LEN, "text", NULL, "192.168.3.0");
 EspWifiParameter netmaskParam = EspWifiParameter("Subnet mask", "netmask", netmaskValue, STRING_LEN, "text", NULL, "255.255.255.0");
@@ -97,14 +97,14 @@ void loop()
  */
 void handleRoot()
 {
-  // -- Let ESPWIFI test and handle captive portal requests.
+  // -- Let EspWifi test and handle captive portal requests.
   if (espWifi.handleCaptivePortal())
   {
     // -- Captive portal request were already served.
     return;
   }
   String s = "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>";
-  s += "<title>ESPWIFI 09 Custom Connection</title></head><body>Hello world!";
+  s += "<title>EspWifi 09 Custom Connection</title></head><body>Hello world!";
   s += "<ul>";
   s += "<li>IP address: ";
   s += ipAddressValue;

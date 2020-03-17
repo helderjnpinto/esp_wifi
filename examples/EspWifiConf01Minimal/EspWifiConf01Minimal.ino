@@ -15,10 +15,10 @@
  *
  *   Note that you can find detailed debug information in the serial console depending
  *   on the settings ESPWIFI_DEBUG_TO_SERIAL, ESPWIFI_DEBUG_PWD_TO_SERIAL set
- *   in the ESPWIFI.h .
+ *   in the EspWifi.h .
  */
 
-#include <ESPWIFI.h>
+#include <EspWifi.h>
 
 // -- Initial name of the Thing. Used e.g. as SSID of the own Access Point.
 const char thingName[] = "testThing";
@@ -29,7 +29,7 @@ const char wifiInitialApPassword[] = "smrtTHNG8266";
 DNSServer dnsServer;
 WebServer server(80);
 
-ESPWIFI espWifi(thingName, &dnsServer, &server, wifiInitialApPassword);
+EspWifi espWifi(thingName, &dnsServer, &server, wifiInitialApPassword);
 
 void setup() 
 {
@@ -59,14 +59,14 @@ void loop()
  */
 void handleRoot()
 {
-  // -- Let ESPWIFI test and handle captive portal requests.
+  // -- Let EspWifi test and handle captive portal requests.
   if (espWifi.handleCaptivePortal())
   {
     // -- Captive portal request were already served.
     return;
   }
   String s = "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>";
-  s += "<title>ESPWIFI 01 Minimal</title></head><body>Hello world!";
+  s += "<title>EspWifi 01 Minimal</title></head><body>Hello world!";
   s += "Go to <a href='config'>configure page</a> to change settings.";
   s += "</body></html>\n";
 

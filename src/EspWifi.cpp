@@ -1,6 +1,6 @@
 #include <EEPROM.h>
 
-#include "ESPWIFI.h"
+#include "EspWifi.h"
 
 #ifdef ESPWIFI_CONFIG_USE_MDNS
 # ifdef ESP8266
@@ -56,7 +56,7 @@ EspWifiSeparator::EspWifiSeparator(const char* label)
 
 ////////////////////////////////////////////////////////////////
 
-ESPWIFI::ESPWIFI(
+EspWifi::EspWifi(
     const char* defaultThingName, DNSServer* dnsServer, WebServer* server,
     const char* initialApPassword, const char* configVersion)
 {
@@ -79,29 +79,29 @@ ESPWIFI::ESPWIFI(
   this->addParameter(&this->_apTimeoutParameter);
 }
 
-char* ESPWIFI::getThingName()
+char* EspWifi::getThingName()
 {
   return this->_thingName;
 }
 
-void ESPWIFI::setConfigPin(int configPin)
+void EspWifi::setConfigPin(int configPin)
 {
   this->_configPin = configPin;
 }
 
-void ESPWIFI::setStatusPin(int statusPin)
+void EspWifi::setStatusPin(int statusPin)
 {
   this->_statusPin = statusPin;
 }
 
-void ESPWIFI::setupUpdateServer(
+void EspWifi::setupUpdateServer(
     HTTPUpdateServer* updateServer, const char* updatePath)
 {
   this->_updateServer = updateServer;
   this->_updatePath = updatePath;
 }
 
-boolean ESPWIFI::init()
+boolean EspWifi::init()
 {
   // -- Setup pins.
   if (this->_configPin >= 0)
@@ -147,7 +147,7 @@ boolean ESPWIFI::init()
 
 //////////////////////////////////////////////////////////////////
 
-bool ESPWIFI::addParameter(EspWifiParameter* parameter)
+bool EspWifi::addParameter(EspWifiParameter* parameter)
 {
 /*
 #ifdef ESPWIFI_DEBUG_TO_SERIAL
@@ -172,7 +172,7 @@ bool ESPWIFI::addParameter(EspWifiParameter* parameter)
   return true;
 }
 
-void ESPWIFI::configInit()
+void EspWifi::configInit()
 {
   int size = 0;
   EspWifiParameter* current = this->_firstParameter;
@@ -193,7 +193,7 @@ void ESPWIFI::configInit()
 /**
  * Load the configuration from the eeprom.
  */
-boolean ESPWIFI::configLoad()
+boolean EspWifi::configLoad()
 {
   if (this->configTestVersion())
   {
@@ -252,7 +252,7 @@ boolean ESPWIFI::configLoad()
   }
 }
 
-void ESPWIFI::configSave()
+void EspWifi::configSave()
 {
   this->configSaveConfigVersion();
   EspWifiParameter* current = this->_firstParameter;
@@ -298,14 +298,14 @@ void ESPWIFI::configSave()
   }
 }
 
-void ESPWIFI::readEepromValue(int start, char* valueBuffer, int length)
+void EspWifi::readEepromValue(int start, char* valueBuffer, int length)
 {
   for (int t = 0; t < length; t++)
   {
     *((char*)valueBuffer + t) = EEPROM.read(start + t);
   }
 }
-void ESPWIFI::writeEepromValue(int start, char* valueBuffer, int length)
+void EspWifi::writeEepromValue(int start, char* valueBuffer, int length)
 {
   for (int t = 0; t < length; t++)
   {
@@ -313,7 +313,7 @@ void ESPWIFI::writeEepromValue(int start, char* valueBuffer, int length)
   }
 }
 
-boolean ESPWIFI::configTestVersion()
+boolean EspWifi::configTestVersion()
 {
   for (byte t = 0; t < ESPWIFI_CONFIG_VESION_LENGTH; t++)
   {
@@ -325,7 +325,7 @@ boolean ESPWIFI::configTestVersion()
   return true;
 }
 
-void ESPWIFI::configSaveConfigVersion()
+void EspWifi::configSaveConfigVersion()
 {
   for (byte t = 0; t < ESPWIFI_CONFIG_VESION_LENGTH; t++)
   {
@@ -333,29 +333,29 @@ void ESPWIFI::configSaveConfigVersion()
   }
 }
 
-void ESPWIFI::setWifiConnectionCallback(std::function<void()> func)
+void EspWifi::setWifiConnectionCallback(std::function<void()> func)
 {
   this->_wifiConnectionCallback = func;
 }
 
-void ESPWIFI::setConfigSavedCallback(std::function<void()> func)
+void EspWifi::setConfigSavedCallback(std::function<void()> func)
 {
   this->_configSavedCallback = func;
 }
 
-void ESPWIFI::setFormValidator(std::function<boolean()> func)
+void EspWifi::setFormValidator(std::function<boolean()> func)
 {
   this->_formValidator = func;
 }
 
-void ESPWIFI::setWifiConnectionTimeoutMs(unsigned long millis)
+void EspWifi::setWifiConnectionTimeoutMs(unsigned long millis)
 {
   this->_wifiConnectionTimeoutMs = millis;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void ESPWIFI::handleConfig()
+void EspWifi::handleConfig()
 {
   if (this->_state == ESPWIFI_STATE_ONLINE)
   {
@@ -579,7 +579,7 @@ void ESPWIFI::handleConfig()
   }
 }
 
-void ESPWIFI::readParamValue(
+void EspWifi::readParamValue(
     const char* paramName, char* target, unsigned int len)
 {
   String value = this->_server->arg(paramName);
@@ -592,7 +592,7 @@ void ESPWIFI::readParamValue(
   value.toCharArray(target, len);
 }
 
-boolean ESPWIFI::validateForm()
+boolean EspWifi::validateForm()
 {
   // -- Clean previous error messages.
   EspWifiParameter* current = this->_firstParameter;
@@ -635,7 +635,7 @@ boolean ESPWIFI::validateForm()
   return valid;
 }
 
-void ESPWIFI::handleNotFound()
+void EspWifi::handleNotFound()
 {
   if (this->handleCaptivePortal())
   {
@@ -677,7 +677,7 @@ void ESPWIFI::handleNotFound()
  * Return true in that case so the page handler do not try to handle the request
  * again. (Code from WifiManager project.)
  */
-boolean ESPWIFI::handleCaptivePortal()
+boolean EspWifi::handleCaptivePortal()
 {
   String host = this->_server->hostHeader();
   String thingName = String(this->_thingName);
@@ -700,7 +700,7 @@ boolean ESPWIFI::handleCaptivePortal()
 }
 
 /** Is this an IP? */
-boolean ESPWIFI::isIp(String str)
+boolean EspWifi::isIp(String str)
 {
   for (size_t i = 0; i < str.length(); i++)
   {
@@ -714,7 +714,7 @@ boolean ESPWIFI::isIp(String str)
 }
 
 /** IP to String? */
-String ESPWIFI::toStringIp(IPAddress ip)
+String EspWifi::toStringIp(IPAddress ip)
 {
   String res = "";
   for (int i = 0; i < 3; i++)
@@ -727,7 +727,7 @@ String ESPWIFI::toStringIp(IPAddress ip)
 
 /////////////////////////////////////////////////////////////////////////////////
 
-void ESPWIFI::delay(unsigned long m)
+void EspWifi::delay(unsigned long m)
 {
   unsigned long delayStart = millis();
   while (m > millis() - delayStart)
@@ -738,7 +738,7 @@ void ESPWIFI::delay(unsigned long m)
   }
 }
 
-void ESPWIFI::doLoop()
+void EspWifi::doLoop()
 {
   doBlink();
   yield(); // -- Yield should not be necessary, but cannot hurt eather.
@@ -800,7 +800,7 @@ void ESPWIFI::doLoop()
 /**
  * What happens, when a state changed...
  */
-void ESPWIFI::changeState(byte newState)
+void EspWifi::changeState(byte newState)
 {
   switch (newState)
   {
@@ -847,7 +847,7 @@ void ESPWIFI::changeState(byte newState)
 /**
  * What happens, when a state changed...
  */
-void ESPWIFI::stateChanged(byte oldState, byte newState)
+void EspWifi::stateChanged(byte oldState, byte newState)
 {
 //  updateOutput();
   switch (newState)
@@ -912,7 +912,7 @@ void ESPWIFI::stateChanged(byte oldState, byte newState)
   }
 }
 
-void ESPWIFI::checkApTimeout()
+void EspWifi::checkApTimeout()
 {
   if ((this->_wifiSsid[0] != '\0') && (this->_apPassword[0] != '\0') &&
       (!this->_forceDefaultPassword))
@@ -932,7 +932,7 @@ void ESPWIFI::checkApTimeout()
  * If so, we must not change state. But when our guest leaved, we can
  * immediately move on.
  */
-void ESPWIFI::checkConnection()
+void EspWifi::checkConnection()
 {
   if ((this->_apConnectionStatus == ESPWIFI_AP_CONNECTION_STATE_NC) &&
       (WiFi.softAPgetStationNum() > 0))
@@ -954,7 +954,7 @@ void ESPWIFI::checkConnection()
   }
 }
 
-boolean ESPWIFI::checkWifiConnection()
+boolean EspWifi::checkWifiConnection()
 {
   if (WiFi.status() != WL_CONNECTED)
   {
@@ -989,7 +989,7 @@ boolean ESPWIFI::checkWifiConnection()
   return true;
 }
 
-void ESPWIFI::setupAp()
+void EspWifi::setupAp()
 {
   WiFi.mode(WIFI_AP);
 
@@ -1035,7 +1035,7 @@ void ESPWIFI::setupAp()
   this->_dnsServer->start(ESPWIFI_DNS_PORT, "*", WiFi.softAPIP());
 }
 
-void ESPWIFI::stopAp()
+void EspWifi::stopAp()
 {
   WiFi.softAPdisconnect(true);
   WiFi.mode(WIFI_STA);
@@ -1043,7 +1043,7 @@ void ESPWIFI::stopAp()
 
 ////////////////////////////////////////////////////////////////////
 
-void ESPWIFI::blink(unsigned long repeatMs, byte dutyCyclePercent)
+void EspWifi::blink(unsigned long repeatMs, byte dutyCyclePercent)
 {
   if (repeatMs == 0)
   {
@@ -1056,26 +1056,26 @@ void ESPWIFI::blink(unsigned long repeatMs, byte dutyCyclePercent)
   }
 }
 
-void ESPWIFI::fineBlink(unsigned long onMs, unsigned long offMs)
+void EspWifi::fineBlink(unsigned long onMs, unsigned long offMs)
 {
   this->_blinkOnMs = onMs;
   this->_blinkOffMs = offMs;
 }
 
-void ESPWIFI::stopCustomBlink()
+void EspWifi::stopCustomBlink()
 {
   this->_blinkOnMs = this->_internalBlinkOnMs;
   this->_blinkOffMs = this->_internalBlinkOffMs;
 }
 
-void ESPWIFI::blinkInternal(unsigned long repeatMs, byte dutyCyclePercent)
+void EspWifi::blinkInternal(unsigned long repeatMs, byte dutyCyclePercent)
 {
   this->blink(repeatMs, dutyCyclePercent);
   this->_internalBlinkOnMs = this->_blinkOnMs;
   this->_internalBlinkOffMs = this->_blinkOffMs;
 }
 
-void ESPWIFI::doBlink()
+void EspWifi::doBlink()
 {
   if (ESPWIFI_STATUS_ENABLED)
   {
@@ -1091,15 +1091,15 @@ void ESPWIFI::doBlink()
   }
 }
 
-boolean ESPWIFI::connectAp(const char* apName, const char* password)
+boolean EspWifi::connectAp(const char* apName, const char* password)
 {
   return WiFi.softAP(apName, password);
 }
-void ESPWIFI::connectWifi(const char* ssid, const char* password)
+void EspWifi::connectWifi(const char* ssid, const char* password)
 {
   WiFi.begin(ssid, password);
 }
-EspWifiAuthInfo* ESPWIFI::handleConnectWifiFailure()
+EspWifiAuthInfo* EspWifi::handleConnectWifiFailure()
 {
   return NULL;
 }

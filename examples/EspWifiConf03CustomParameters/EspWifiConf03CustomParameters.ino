@@ -3,7 +3,7 @@
  * Description:
  *   In this example it is shown how to attach your custom parameters
  *   to the config portal. Your parameters will be maintained by 
- *   ESPWIFI. This means, they will be loaded from/saved to EEPROM,
+ *   EspWifi. This means, they will be loaded from/saved to EEPROM,
  *   and will appear in the config portal.
  *   Note the configSaved and formValidator callbacks!
  *   (See previous examples for more details!)
@@ -14,7 +14,7 @@
  *     button should be attached to GND.
  */
 
-#include <ESPWIFI.h>
+#include <EspWifi.h>
 
 // -- Initial name of the Thing. Used e.g. as SSID of the own Access Point.
 const char thingName[] = "testThing";
@@ -48,7 +48,7 @@ char stringParamValue[STRING_LEN];
 char intParamValue[NUMBER_LEN];
 char floatParamValue[NUMBER_LEN];
 
-ESPWIFI espWifi(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
+EspWifi espWifi(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
 EspWifiParameter stringParam = EspWifiParameter("String param", "stringParam", stringParamValue, STRING_LEN);
 EspWifiSeparator separator1 = EspWifiSeparator();
 EspWifiParameter intParam = EspWifiParameter("Int param", "intParam", intParamValue, NUMBER_LEN, "number", "1..100", NULL, "min='1' max='100' step='1'");
@@ -95,14 +95,14 @@ void loop()
  */
 void handleRoot()
 {
-  // -- Let ESPWIFI test and handle captive portal requests.
+  // -- Let EspWifi test and handle captive portal requests.
   if (espWifi.handleCaptivePortal())
   {
     // -- Captive portal request were already served.
     return;
   }
   String s = "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>";
-  s += "<title>ESPWIFI 03 Custom Parameters</title></head><body>Hello world!";
+  s += "<title>EspWifi 03 Custom Parameters</title></head><body>Hello world!";
   s += "<ul>";
   s += "<li>String param value: ";
   s += stringParamValue;

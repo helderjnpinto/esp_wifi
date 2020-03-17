@@ -1,8 +1,8 @@
 /**
  * Example: MQTT Demo Application
  * Description:
- *   All ESPWIFI specific aspects of this example are described in
- *   previous examples, so please get familiar with ESPWIFI before
+ *   All EspWifi specific aspects of this example are described in
+ *   previous examples, so please get familiar with EspWifi before
  *   starting this example. So nothing new will be explained here, 
  *   but a complete demo application will be build.
  *   It is also expected from the reader to have a basic knowledge over
@@ -26,7 +26,7 @@
  */
 
 #include <MQTT.h>
-#include <ESPWIFI.h>
+#include <EspWifi.h>
 
 // -- Initial name of the Thing. Used e.g. as SSID of the own Access Point.
 const char thingName[] = "testThing";
@@ -64,7 +64,7 @@ char mqttServerValue[STRING_LEN];
 char mqttUserNameValue[STRING_LEN];
 char mqttUserPasswordValue[STRING_LEN];
 
-ESPWIFI espWifi(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
+EspWifi espWifi(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
 EspWifiParameter mqttServerParam = EspWifiParameter("MQTT server", "mqttServer", mqttServerValue, STRING_LEN);
 EspWifiParameter mqttUserNameParam = EspWifiParameter("MQTT user", "mqttUser", mqttUserNameValue, STRING_LEN);
 EspWifiParameter mqttUserPasswordParam = EspWifiParameter("MQTT password", "mqttPass", mqttUserPasswordValue, STRING_LEN, "password");
@@ -153,14 +153,14 @@ void loop()
  */
 void handleRoot()
 {
-  // -- Let ESPWIFI test and handle captive portal requests.
+  // -- Let EspWifi test and handle captive portal requests.
   if (espWifi.handleCaptivePortal())
   {
     // -- Captive portal request were already served.
     return;
   }
   String s = "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>";
-  s += "<title>ESPWIFI 06 MQTT App</title></head><body>MQTT App demo";
+  s += "<title>EspWifi 06 MQTT App</title></head><body>MQTT App demo";
   s += "<ul>";
   s += "<li>MQTT server: ";
   s += mqttServerValue;

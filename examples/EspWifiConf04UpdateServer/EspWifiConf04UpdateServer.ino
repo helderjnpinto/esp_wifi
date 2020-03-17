@@ -15,7 +15,7 @@
  *     button should be attached to GND.
  */
 
-#include <ESPWIFI.h>
+#include <EspWifi.h>
 
 // -- Initial name of the Thing. Used e.g. as SSID of the own Access Point.
 const char thingName[] = "testThing";
@@ -39,7 +39,7 @@ DNSServer dnsServer;
 WebServer server(80);
 HTTPUpdateServer httpUpdater;
 
-ESPWIFI espWifi(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
+EspWifi espWifi(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
 
 void setup() 
 {
@@ -73,14 +73,14 @@ void loop()
  */
 void handleRoot()
 {
-  // -- Let ESPWIFI test and handle captive portal requests.
+  // -- Let EspWifi test and handle captive portal requests.
   if (espWifi.handleCaptivePortal())
   {
     // -- Captive portal request were already served.
     return;
   }
   String s = "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>";
-  s += "<title>ESPWIFI 04 Update Server</title></head><body>Hello world!";
+  s += "<title>EspWifi 04 Update Server</title></head><body>Hello world!";
   s += "Go to <a href='config'>configure page</a> to change values.";
   s += "</body></html>\n";
 

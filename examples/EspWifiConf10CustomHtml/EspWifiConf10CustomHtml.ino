@@ -12,7 +12,7 @@
  *   lock on it. By pressing the lock the password became visible/hidden.
  */
 
-#include <ESPWIFI.h>
+#include <EspWifi.h>
 
 // -- Initial name of the Thing. Used e.g. as SSID of the own Access Point.
 const char thingName[] = "testThing";
@@ -23,7 +23,7 @@ const char wifiInitialApPassword[] = "smrtTHNG8266";
 DNSServer dnsServer;
 WebServer server(80);
 
-ESPWIFI espWifi(thingName, &dnsServer, &server, wifiInitialApPassword);
+EspWifi espWifi(thingName, &dnsServer, &server, wifiInitialApPassword);
 
 // -- Javascript block will be added to the header.
 const char CUSTOMHTML_SCRIPT_INNER[] PROGMEM = "\n\
@@ -39,7 +39,7 @@ const char CUSTOMHTML_BODY_INNER[] PROGMEM = "<div><img src='data:image/png;base
 
 // -- This is an OOP technique to override behaviour of the existing
 // EspWifiHtmlFormatProvider. Here two method are overriden from
-// the original class. See ESPWIFI.h for all potentially overridable
+// the original class. See EspWifi.h for all potentially overridable
 // methods of EspWifiHtmlFormatProvider .
 class CustomHtmlFormatProvider : public EspWifiHtmlFormatProvider
 {
@@ -66,7 +66,7 @@ void setup()
   Serial.println();
   Serial.println("Starting up...");
 
-  // -- Applying the new HTML format to ESPWIFI.
+  // -- Applying the new HTML format to EspWifi.
   espWifi.setHtmlFormatProvider(&customHtmlFormatProvider);
   espWifi.init();
 
@@ -89,14 +89,14 @@ void loop()
  */
 void handleRoot()
 {
-  // -- Let ESPWIFI test and handle captive portal requests.
+  // -- Let EspWifi test and handle captive portal requests.
   if (espWifi.handleCaptivePortal())
   {
     // -- Captive portal request were already served.
     return;
   }
   String s = "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>";
-  s += "<title>ESPWIFI 10 Custom HTML</title></head><body>";
+  s += "<title>EspWifi 10 Custom HTML</title></head><body>";
   s += FPSTR(CUSTOMHTML_BODY_INNER);
   s += "Go to <a href='config'>configure page</a> to change settings.";
   s += "</body></html>\n";

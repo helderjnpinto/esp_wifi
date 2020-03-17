@@ -1,6 +1,6 @@
 #ifdef ESP32
 /**
- * NOTE: Lines starting with /// are changed by ESPWIFI
+ * NOTE: Lines starting with /// are changed by EspWifi
  */
 #include "EspWifiCompatibility.h"
 

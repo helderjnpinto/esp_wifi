@@ -1,7 +1,7 @@
 /**
  * Example: Callbacks
  * Description:
- *   This example shows, what callbacks ESPWIFI provides.
+ *   This example shows, what callbacks EspWifi provides.
  *   (See previous examples for more details!)
  * 
  * Hardware setup for this example:
@@ -10,7 +10,7 @@
  *     button should be attached to GND.
  */
 
-#include <ESPWIFI.h>
+#include <EspWifi.h>
 
 // -- Initial name of the Thing. Used e.g. as SSID of the own Access Point.
 const char thingName[] = "testThing";
@@ -44,7 +44,7 @@ HTTPUpdateServer httpUpdater;
 
 char stringParamValue[STRING_LEN];
 
-ESPWIFI espWifi(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
+EspWifi espWifi(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
 EspWifiParameter stringParam = EspWifiParameter("String param", "stringParam", stringParamValue, STRING_LEN);
 
 void setup() 
@@ -86,14 +86,14 @@ void loop()
  */
 void handleRoot()
 {
-  // -- Let ESPWIFI test and handle captive portal requests.
+  // -- Let EspWifi test and handle captive portal requests.
   if (espWifi.handleCaptivePortal())
   {
     // -- Captive portal request were already served.
     return;
   }
   String s = "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>";
-  s += "<title>ESPWIFI 05 Callbacks</title></head><body>Hello world!";
+  s += "<title>EspWifi 05 Callbacks</title></head><body>Hello world!";
   s += "<ul>";
   s += "<li>String param value: ";
   s += stringParamValue;
