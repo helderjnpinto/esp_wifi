@@ -64,7 +64,7 @@ char mqttServerValue[STRING_LEN];
 char mqttUserNameValue[STRING_LEN];
 char mqttUserPasswordValue[STRING_LEN];
 
-ESPWIFI iotWebConf(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
+ESPWIFI espWifi(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
 EspWifiParameter mqttServerParam = EspWifiParameter("MQTT server", "mqttServer", mqttServerValue, STRING_LEN);
 EspWifiParameter mqttUserNameParam = EspWifiParameter("MQTT user", "mqttUser", mqttUserNameValue, STRING_LEN);
 EspWifiParameter mqttUserPasswordParam = EspWifiParameter("MQTT password", "mqttPass", mqttUserPasswordValue, STRING_LEN, "password");
@@ -81,18 +81,18 @@ void setup()
   Serial.println();
   Serial.println("Starting up...");
 
-  iotWebConf.setStatusPin(STATUS_PIN);
-  iotWebConf.setConfigPin(CONFIG_PIN);
-  iotWebConf.addParameter(&mqttServerParam);
-  iotWebConf.addParameter(&mqttUserNameParam);
-  iotWebConf.addParameter(&mqttUserPasswordParam);
-  iotWebConf.setConfigSavedCallback(&configSaved);
-  iotWebConf.setFormValidator(&formValidator);
-  iotWebConf.setWifiConnectionCallback(&wifiConnected);
-  iotWebConf.setupUpdateServer(&httpUpdater);
+  espWifi.setStatusPin(STATUS_PIN);
+  espWifi.setConfigPin(CONFIG_PIN);
+  espWifi.addParameter(&mqttServerParam);
+  espWifi.addParameter(&mqttUserNameParam);
+  espWifi.addParameter(&mqttUserPasswordParam);
+  espWifi.setConfigSavedCallback(&configSaved);
+  espWifi.setFormValidator(&formValidator);
+  espWifi.setWifiConnectionCallback(&wifiConnected);
+  espWifi.setupUpdateServer(&httpUpdater);
 
   // -- Initializing the configuration.
-  boolean validConfig = iotWebConf.init();
+  boolean validConfig = espWifi.init();
   if (!validConfig)
   {
     mqttServerValue[0] = '\0';
@@ -102,8 +102,8 @@ void setup()
 
   // -- Set up required URL handlers on the web server.
   server.on("/", handleRoot);
-  server.on("/config", []{ iotWebConf.handleConfig(); });
-  server.onNotFound([](){ iotWebConf.handleNotFound(); });
+  server.on("/config", []{ espWifi.handleConfig(); });
+  server.onNotFound([](){ espWifi.handleNotFound(); });
 
   mqttClient.begin(mqttServerValue, net);
   mqttClient.onMessage(mqttMessageReceived);
@@ -114,7 +114,7 @@ void setup()
 void loop() 
 {
   // -- doLoop should be called as frequently as possible.
-  iotWebConf.doLoop();
+  espWifi.doLoop();
   mqttClient.loop();
   
   if (needMqttConnect)
@@ -124,7 +124,7 @@ void loop()
       needMqttConnect = false;
     }
   }
-  else if ((iotWebConf.getState() == ESPWIFI_STATE_ONLINE) && (!mqttClient.connected()))
+  else if ((espWifi.getState() == ESPWIFI_STATE_ONLINE) && (!mqttClient.connected()))
   {
     Serial.println("MQTT reconnect");
     connectMqtt();
@@ -133,7 +133,7 @@ void loop()
   if (needReset)
   {
     Serial.println("Rebooting after 1 second.");
-    iotWebConf.delay(1000);
+    espWifi.delay(1000);
     ESP.restart();
   }
 
@@ -154,7 +154,7 @@ void loop()
 void handleRoot()
 {
   // -- Let ESPWIFI test and handle captive portal requests.
-  if (iotWebConf.handleCaptivePortal())
+  if (espWifi.handleCaptivePortal())
   {
     // -- Captive portal request were already served.
     return;
@@ -220,7 +220,7 @@ boolean connectMqtt() {
 boolean connectMqtt() {
   Serial.println("Connecting to MQTT server...");
   while (!connectMqttOptions()) {
-    iotWebConf.delay(1000);
+    espWifi.delay(1000);
   }
   Serial.println("Connected!");
 
@@ -234,15 +234,15 @@ boolean connectMqttOptions()
   boolean result;
   if (mqttUserPasswordValue[0] != '\0')
   {
-    result = mqttClient.connect(iotWebConf.getThingName(), mqttUserNameValue, mqttUserPasswordValue);
+    result = mqttClient.connect(espWifi.getThingName(), mqttUserNameValue, mqttUserPasswordValue);
   }
   else if (mqttUserNameValue[0] != '\0')
   {
-    result = mqttClient.connect(iotWebConf.getThingName(), mqttUserNameValue);
+    result = mqttClient.connect(espWifi.getThingName(), mqttUserNameValue);
   }
   else
   {
-    result = mqttClient.connect(iotWebConf.getThingName());
+    result = mqttClient.connect(espWifi.getThingName());
   }
   return result;
 }

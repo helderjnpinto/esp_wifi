@@ -50,7 +50,7 @@ char ipAddressValue[STRING_LEN];
 char gatewayValue[STRING_LEN];
 char netmaskValue[STRING_LEN];
 
-ESPWIFI iotWebConf(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
+ESPWIFI espWifi(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
 EspWifiParameter ipAddressParam = EspWifiParameter("IP address", "ipAddress", ipAddressValue, STRING_LEN, "text", NULL, "192.168.3.222");
 EspWifiParameter gatewayParam = EspWifiParameter("Gateway", "gateway", gatewayValue, STRING_LEN, "text", NULL, "192.168.3.0");
 EspWifiParameter netmaskParam = EspWifiParameter("Subnet mask", "netmask", netmaskValue, STRING_LEN, "text", NULL, "255.255.255.0");
@@ -65,23 +65,23 @@ void setup()
   Serial.println();
   Serial.println("Starting up...");
 
-  iotWebConf.setStatusPin(STATUS_PIN);
-  iotWebConf.setConfigPin(CONFIG_PIN);
-  iotWebConf.addParameter(&ipAddressParam);
-  iotWebConf.addParameter(&gatewayParam);
-  iotWebConf.addParameter(&netmaskParam);
-  iotWebConf.setConfigSavedCallback(&configSaved);
-  iotWebConf.setFormValidator(&formValidator);
-  iotWebConf.setApConnectionHandler(&connectAp);
-  iotWebConf.setWifiConnectionHandler(&connectWifi);
+  espWifi.setStatusPin(STATUS_PIN);
+  espWifi.setConfigPin(CONFIG_PIN);
+  espWifi.addParameter(&ipAddressParam);
+  espWifi.addParameter(&gatewayParam);
+  espWifi.addParameter(&netmaskParam);
+  espWifi.setConfigSavedCallback(&configSaved);
+  espWifi.setFormValidator(&formValidator);
+  espWifi.setApConnectionHandler(&connectAp);
+  espWifi.setWifiConnectionHandler(&connectWifi);
 
   // -- Initializing the configuration.
-  boolean validConfig = iotWebConf.init();
+  boolean validConfig = espWifi.init();
 
   // -- Set up required URL handlers on the web server.
   server.on("/", handleRoot);
-  server.on("/config", []{ iotWebConf.handleConfig(); });
-  server.onNotFound([](){ iotWebConf.handleNotFound(); });
+  server.on("/config", []{ espWifi.handleConfig(); });
+  server.onNotFound([](){ espWifi.handleNotFound(); });
 
   Serial.println("Ready.");
 }
@@ -89,7 +89,7 @@ void setup()
 void loop() 
 {
   // -- doLoop should be called as frequently as possible.
-  iotWebConf.doLoop();
+  espWifi.doLoop();
 }
 
 /**
@@ -98,7 +98,7 @@ void loop()
 void handleRoot()
 {
   // -- Let ESPWIFI test and handle captive portal requests.
-  if (iotWebConf.handleCaptivePortal())
+  if (espWifi.handleCaptivePortal())
   {
     // -- Captive portal request were already served.
     return;

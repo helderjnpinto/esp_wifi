@@ -86,11 +86,11 @@ const char ESPWIFI_HTML_CONFIG_VER[] PROGMEM   = "<div style='font-size: .6em;'>
 // -- User name on login.
 #define ESPWIFI_ADMIN_USER_NAME "admin"
 
-typedef struct EspWifiWifiAuthInfo
+typedef struct EspWifiAuthInfo
 {
   const char* ssid;
   const char* password;
-} EspWifiWifiAuthInfo;
+} EspWifiAuthInfo;
 
 /**
  *   EspWifiParameters is a configuration item of the config portal.
@@ -323,7 +323,7 @@ public:
    * Note, that this feature is provided because of a possible future option of providing multiply
    * WiFi settings.
    */
-  void setWifiConnectionFailedHandler( std::function<EspWifiWifiAuthInfo*()> func )
+  void setWifiConnectionFailedHandler( std::function<EspWifiAuthInfo*()> func )
   {
     _wifiConnectionFailureHandler = func;
   }
@@ -499,7 +499,7 @@ private:
       &(ESPWIFI::connectAp);
   std::function<void(const char*, const char*)> _wifiConnectionHandler =
       &(ESPWIFI::connectWifi);
-  std::function<EspWifiWifiAuthInfo*()> _wifiConnectionFailureHandler =
+  std::function<EspWifiAuthInfo*()> _wifiConnectionFailureHandler =
       &(ESPWIFI::handleConnectWifiFailure);
   unsigned long _internalBlinkOnMs = 500;
   unsigned long _internalBlinkOffMs = 500;
@@ -508,7 +508,7 @@ private:
   byte _blinkState = ESPWIFI_STATUS_ON;
   unsigned long _lastBlinkTime = 0;
   unsigned long _wifiConnectionStart = 0;
-  EspWifiWifiAuthInfo _wifiAuthInfo = {_wifiSsid, _wifiPassword};
+  EspWifiAuthInfo _wifiAuthInfo = {_wifiSsid, _wifiPassword};
   EspWifiHtmlFormatProvider htmlFormatProviderInstance;
   EspWifiHtmlFormatProvider* htmlFormatProvider = &htmlFormatProviderInstance;
 
@@ -541,7 +541,7 @@ private:
 
   static boolean connectAp(const char* apName, const char* password);
   static void connectWifi(const char* ssid, const char* password);
-  static EspWifiWifiAuthInfo* handleConnectWifiFailure();
+  static EspWifiAuthInfo* handleConnectWifiFailure();
 };
 
 #endif

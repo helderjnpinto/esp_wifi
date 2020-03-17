@@ -23,7 +23,7 @@ const char wifiInitialApPassword[] = "smrtTHNG8266";
 DNSServer dnsServer;
 WebServer server(80);
 
-ESPWIFI iotWebConf(thingName, &dnsServer, &server, wifiInitialApPassword);
+ESPWIFI espWifi(thingName, &dnsServer, &server, wifiInitialApPassword);
 
 // -- Javascript block will be added to the header.
 const char CUSTOMHTML_SCRIPT_INNER[] PROGMEM = "\n\
@@ -67,13 +67,13 @@ void setup()
   Serial.println("Starting up...");
 
   // -- Applying the new HTML format to ESPWIFI.
-  iotWebConf.setHtmlFormatProvider(&customHtmlFormatProvider);
-  iotWebConf.init();
+  espWifi.setHtmlFormatProvider(&customHtmlFormatProvider);
+  espWifi.init();
 
   // -- Set up required URL handlers on the web server.
   server.on("/", handleRoot);
-  server.on("/config", []{ iotWebConf.handleConfig(); });
-  server.onNotFound([](){ iotWebConf.handleNotFound(); });
+  server.on("/config", []{ espWifi.handleConfig(); });
+  server.onNotFound([](){ espWifi.handleNotFound(); });
 
   Serial.println("Ready.");
 }
@@ -81,7 +81,7 @@ void setup()
 void loop() 
 {
   // -- doLoop should be called as frequently as possible.
-  iotWebConf.doLoop();
+  espWifi.doLoop();
 }
 
 /**
@@ -90,7 +90,7 @@ void loop()
 void handleRoot()
 {
   // -- Let ESPWIFI test and handle captive portal requests.
-  if (iotWebConf.handleCaptivePortal())
+  if (espWifi.handleCaptivePortal())
   {
     // -- Captive portal request were already served.
     return;

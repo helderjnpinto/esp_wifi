@@ -963,7 +963,7 @@ boolean ESPWIFI::checkWifiConnection()
       // -- WiFi not available, fall back to AP mode.
       ESPWIFI_DEBUG_LINE(F("Giving up."));
       WiFi.disconnect(true);
-      EspWifiWifiAuthInfo* newWifiAuthInfo = _wifiConnectionFailureHandler();
+      EspWifiAuthInfo* newWifiAuthInfo = _wifiConnectionFailureHandler();
       if (newWifiAuthInfo != NULL)
       {
         // -- Try connecting with another connection info.
@@ -1099,7 +1099,7 @@ void ESPWIFI::connectWifi(const char* ssid, const char* password)
 {
   WiFi.begin(ssid, password);
 }
-EspWifiWifiAuthInfo* ESPWIFI::handleConnectWifiFailure()
+EspWifiAuthInfo* ESPWIFI::handleConnectWifiFailure()
 {
   return NULL;
 }

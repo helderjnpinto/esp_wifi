@@ -57,7 +57,7 @@ DNSServer dnsServer;
 WebServer server(80);
 HTTPUpdateServer httpUpdater;
 
-ESPWIFI iotWebConf(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
+ESPWIFI espWifi(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
 
 boolean needReset = false;
 int needAction = NO_ACTION;
@@ -72,18 +72,18 @@ void setup()
 
   pinMode(RELAY_PIN, OUTPUT);
 
-  iotWebConf.setStatusPin(STATUS_PIN);
-  iotWebConf.setConfigPin(BUTTON_PIN);
-  iotWebConf.setConfigSavedCallback(&configSaved);
-  iotWebConf.setupUpdateServer(&httpUpdater);
+  espWifi.setStatusPin(STATUS_PIN);
+  espWifi.setConfigPin(BUTTON_PIN);
+  espWifi.setConfigSavedCallback(&configSaved);
+  espWifi.setupUpdateServer(&httpUpdater);
 
   // -- Initializing the configuration.
-  iotWebConf.init();
+  espWifi.init();
 
   // -- Set up required URL handlers on the web server.
   server.on("/", handleRoot);
-  server.on("/config", []{ iotWebConf.handleConfig(); });
-  server.onNotFound([](){ iotWebConf.handleNotFound(); });
+  server.on("/config", []{ espWifi.handleConfig(); });
+  server.onNotFound([](){ espWifi.handleNotFound(); });
 
   Serial.println("Ready.");
 }
@@ -91,12 +91,12 @@ void setup()
 void loop() 
 {
   // -- doLoop should be called as frequently as possible.
-  iotWebConf.doLoop();
+  espWifi.doLoop();
 
   if (needReset)
   {
     Serial.println("Rebooting after 1 second.");
-    iotWebConf.delay(1000);
+    espWifi.delay(1000);
     ESP.restart();
   }
 
@@ -121,11 +121,11 @@ void applyAction(unsigned long now)
     digitalWrite(RELAY_PIN, state);
     if (state == HIGH)
     {
-      iotWebConf.blink(5000, 95);
+      espWifi.blink(5000, 95);
     }
     else
     {
-      iotWebConf.stopCustomBlink();
+      espWifi.stopCustomBlink();
     }
     Serial.print("Switched ");
     Serial.println(state == HIGH ? "ON" : "OFF");
@@ -140,7 +140,7 @@ void applyAction(unsigned long now)
 void handleRoot()
 {
   // -- Let ESPWIFI test and handle captive portal requests.
-  if (iotWebConf.handleCaptivePortal())
+  if (espWifi.handleCaptivePortal())
   {
     // -- Captive portal request were already served.
     return;
@@ -161,9 +161,9 @@ void handleRoot()
   }
   
   String s = F("<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>");
-  s += iotWebConf.getHtmlFormatProvider()->getStyle();
+  s += espWifi.getHtmlFormatProvider()->getStyle();
   s += "<title>ESPWIFI 08 Web Relay</title></head><body>";
-  s += iotWebConf.getThingName();
+  s += espWifi.getThingName();
   s += "<div>State: ";
   s += (state == HIGH ? "ON" : "OFF");
   s += "</div>";

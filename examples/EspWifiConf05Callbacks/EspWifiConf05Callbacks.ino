@@ -44,7 +44,7 @@ HTTPUpdateServer httpUpdater;
 
 char stringParamValue[STRING_LEN];
 
-ESPWIFI iotWebConf(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
+ESPWIFI espWifi(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
 EspWifiParameter stringParam = EspWifiParameter("String param", "stringParam", stringParamValue, STRING_LEN);
 
 void setup() 
@@ -53,15 +53,15 @@ void setup()
   Serial.println();
   Serial.println("Starting up...");
 
-  iotWebConf.setStatusPin(STATUS_PIN);
-  iotWebConf.setConfigPin(CONFIG_PIN);
-  iotWebConf.addParameter(&stringParam);
-  iotWebConf.setConfigSavedCallback(&configSaved);
-  iotWebConf.setFormValidator(&formValidator);
-  iotWebConf.setWifiConnectionCallback(&wifiConnected);
+  espWifi.setStatusPin(STATUS_PIN);
+  espWifi.setConfigPin(CONFIG_PIN);
+  espWifi.addParameter(&stringParam);
+  espWifi.setConfigSavedCallback(&configSaved);
+  espWifi.setFormValidator(&formValidator);
+  espWifi.setWifiConnectionCallback(&wifiConnected);
 
   // -- Initializing the configuration.
-  boolean validConfig = iotWebConf.init();
+  boolean validConfig = espWifi.init();
   if (!validConfig)
   {
     stringParamValue[0] = '\0';
@@ -69,8 +69,8 @@ void setup()
 
   // -- Set up required URL handlers on the web server.
   server.on("/", handleRoot);
-  server.on("/config", []{ iotWebConf.handleConfig(); });
-  server.onNotFound([](){ iotWebConf.handleNotFound(); });
+  server.on("/config", []{ espWifi.handleConfig(); });
+  server.onNotFound([](){ espWifi.handleNotFound(); });
 
   Serial.println("Ready.");
 }
@@ -78,7 +78,7 @@ void setup()
 void loop() 
 {
   // -- doLoop should be called as frequently as possible.
-  iotWebConf.doLoop();
+  espWifi.doLoop();
 }
 
 /**
@@ -87,7 +87,7 @@ void loop()
 void handleRoot()
 {
   // -- Let ESPWIFI test and handle captive portal requests.
-  if (iotWebConf.handleCaptivePortal())
+  if (espWifi.handleCaptivePortal())
   {
     // -- Captive portal request were already served.
     return;
